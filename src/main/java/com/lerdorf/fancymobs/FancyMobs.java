@@ -45,6 +45,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityMountEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -174,7 +175,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				Sound.sound(Key.key("yeet:spino_death"), Source.NEUTRAL, 1.0f, 1.0f),
 				40,
 				new Attack[] { 
-						new Attack("bite", 8, new HashMap<>() {
+						new Attack("bite", 7, new HashMap<>() {
 							{
 								put(Attack.WEAKNESS, 2d);
 							}
@@ -316,6 +317,10 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 			if (fm != null) {
 				fm.rightClick(event);
 			}
+		} else if (entity instanceof LivingEntity le) {
+			if (le.getScoreboardTags().contains("fm_mob")) {
+				getFancyMob(le).rightClick(event);;
+			}
 		}
 	}
 	
@@ -327,7 +332,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 		for (LivingEntity fm : nearbyFancyMobs) {
 			FancyMob fancyMob = getFancyMob(fm);
 			for (RenderedBone bone : fancyMob.tracker.bones()) {
-				if (bone.getHitBox().source().getUniqueId() == interaction.getUniqueId()) {
+				if (bone.getHitBox() != null && bone.getHitBox().source() != null && bone.getHitBox().source().getUniqueId() == interaction.getUniqueId()) {
 					return fancyMob;
 				}
 			}

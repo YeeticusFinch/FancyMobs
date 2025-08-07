@@ -27,8 +27,13 @@ public class Util {
 	}
 	
 	public static void playSound(Sound sound, Location loc) {
+		try {
 		if (sound != null)
 			if (loc.getNearbyPlayers(30*sound.volume()).size() > 0)
-				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute in " + Util.getDimension(loc.getWorld()) + " positioned " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ() + " run playsound " + sound.name().asString() + " NEUTRAL @a ~ ~ ~ " + sound.volume() + " " + sound.pitch());
+				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute in " + Util.getDimension(loc.getWorld()) + " positioned " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ() + " run playsound " + sound.name().asString().toLowerCase().trim() + " neutral @a ~ ~ ~ " + sound.volume() + " " + sound.pitch());
+	
+		} catch (Exception e) {
+			Bukkit.getLogger().warning(e.getLocalizedMessage());
+		}
 	}
 }

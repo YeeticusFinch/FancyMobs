@@ -264,6 +264,16 @@ public class FancyMob {
 		}
 	}
 	
+	public ArrayList<Entity> getPassengers() {
+		ArrayList<Entity> result = new ArrayList<Entity>();
+		for (RenderedBone bone : tracker.bones()) {
+			if (bone.getHitBox() != null && bone.getHitBox().source() != null) {
+				result.addAll(bone.getHitBox().source().getPassengers());
+			}
+		}
+		return result;
+	}
+	
 	private boolean isDamageHitboxBone(RenderedBone bone) {
 	    String name = bone.getName().name();
 	    return /*name.equalsIgnoreCase("hitbox") ||*/ name.startsWith("b_") || name.startsWith("ob_");
@@ -299,10 +309,13 @@ public class FancyMob {
 					modelName = tameable.saddleModel;
 					player.getEquipment().getItemInMainHand().setAmount(player.getEquipment().getItemInMainHand().getAmount()-1);
 					
-					spawn(loc);
-					entity.setHealth(health);
-					entity.teleport(loc);
-					tameable.saddled = true;
+					Bukkit.getScheduler().runTaskLater(FancyMobs.plugin, () -> {
+						Bukkit.getLogger().warning("Setting " + name + " model to " + modelName);
+						spawn(loc);
+						entity.setHealth(health);
+						entity.teleport(loc);
+						tameable.saddled = true;
+					}, 5);
 				}
 			}
 		} 

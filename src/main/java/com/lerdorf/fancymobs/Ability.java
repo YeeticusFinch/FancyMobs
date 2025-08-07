@@ -66,6 +66,18 @@ public class Ability {
 		if (mob.entity != null && mob.entity.isValid() && target != null && target.isValid()) {
 			distance = mob.entity.getEyeLocation().distance(target.getLocation());
 		}
+		if ((mob.entity.getScoreboardTags().contains("sitting") || mob.entity.getScoreboardTags().contains("sleeping")) && mob.getPassengers().size() > 0) {
+			if (mob.entity.getScoreboardTags().contains("sitting")) {
+				mob.entity.removePotionEffect(PotionEffectType.SLOWNESS);
+				mob.entity.removeScoreboardTag("sitting");
+				mob.tracker.stopAnimation("sitting");
+			}
+			if (mob.entity.getScoreboardTags().contains("sleeping")) {
+				mob.entity.removePotionEffect(PotionEffectType.SLOWNESS);
+				mob.entity.removeScoreboardTag("sleeping");
+				mob.tracker.stopAnimation("sleeping");
+			}
+		}
 		switch (id) {
 		case RED_LASER: {
 			if (force || distance > 5 && distance < 60) {

@@ -20,6 +20,7 @@ public class Tameable {
 		this.tameMaterial = tameMaterial;
 		this.saddleItem = saddleItem;
 		this.saddleable = saddleable;
+		this.saddleModel = saddleModel;
 	}
 	
 	public Tameable(Material[] tameMaterial, ItemStack saddleItem, boolean saddleable, String saddleModel, float tameChance) {
@@ -27,6 +28,7 @@ public class Tameable {
 		this.saddleItem = saddleItem;
 		this.saddleable = saddleable;
 		this.tameChance = tameChance;
+		this.saddleModel = saddleModel;
 	}
 
 	public int tryTame(Player player) {
