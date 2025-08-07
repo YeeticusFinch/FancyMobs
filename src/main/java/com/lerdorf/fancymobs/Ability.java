@@ -152,8 +152,7 @@ public class Ability {
 				Collection<PotionEffect> newEffects = new ArrayList<>();
 				newEffects.add(new PotionEffect(PotionEffectType.SLOWNESS, 20*2, 5, true, false));
 				mob.entity.addPotionEffects(newEffects);
-				if (sound != null)
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute in " + Util.getDimension(loc.getWorld()) + " positioned " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ() + " run playsound " + sound.name().asString() + " NEUTRAL @a ~ ~ ~ " + sound.volume() + " " + sound.pitch());
+				Util.playSound(sound, loc);
 				mob.entity.addScoreboardTag("shaking");
 				Bukkit.getScheduler().runTaskLater(FancyMobs.plugin, () -> {
 					mob.tracker.stopAnimation(anim);
@@ -169,8 +168,7 @@ public class Ability {
 				Collection<PotionEffect> newEffects = new ArrayList<>();
 				newEffects.add(new PotionEffect(PotionEffectType.SLOWNESS, 20*3, 50, true, false));
 				mob.entity.addPotionEffects(newEffects);
-				if (sound != null)
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute in " + Util.getDimension(loc.getWorld()) + " positioned " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ() + " run playsound " + sound.name().asString() + " NEUTRAL @a ~ ~ ~ " + sound.volume() + " " + sound.pitch());
+				Util.playSound(sound, loc);
 				mob.entity.addScoreboardTag("roaring");
 				Bukkit.getScheduler().runTaskLater(FancyMobs.plugin, () -> {
 					mob.tracker.stopAnimation(anim);

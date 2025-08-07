@@ -129,17 +129,14 @@ public class FancyMob {
 	public void hurt() {
 		//entity.getWorld().playSound(entity, hurtSound.name().asString(), hurtSound.volume(), hurtSound.pitch());
 		Location loc = entity.getLocation();
-		if (hurtSound != null)
-			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute in " + Util.getDimension(loc.getWorld()) + " positioned " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ() + " run playsound " + hurtSound.name().asString() + " " + getAlignmentString() + " @a ~ ~ ~ " + hurtSound.volume() + " " + hurtSound.pitch());
-	
+		Util.playSound(hurtSound, loc);
 		tracker.animate("hurt");
 	}
 	
 	public void death() {
 		//entity.getWorld().playSound(entity, deathSound.name().asString(), deathSound.volume(), deathSound.pitch());
 		Location loc = entity.getLocation();
-		if (deathSound != null)
-			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute in " + Util.getDimension(loc.getWorld()) + " positioned " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ() + " run playsound " + deathSound.name().asString() + " " + getAlignmentString() + " @a ~ ~ ~ " + deathSound.volume() + " " + deathSound.pitch());
+		Util.playSound(deathSound, loc);
 		//entity.setInvisible(true);
 		//entity.setVisibleByDefault(false);
 	}
@@ -196,7 +193,7 @@ public class FancyMob {
 			if (Math.random() < 0.1 && ambientSound != null && System.currentTimeMillis() - lastAmbient > 1500) {
 				lastAmbient = System.currentTimeMillis();
 				Location loc = entity.getLocation();
-				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute in " + Util.getDimension(loc.getWorld()) + " positioned " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ() + " run playsound " + ambientSound.name().asString() + " " + getAlignmentString() + " @a ~ ~ ~ " + ambientSound.volume() + " " + ambientSound.pitch());
+				Util.playSound(ambientSound, loc);
 			}
 		}
 	}
@@ -299,10 +296,13 @@ public class FancyMob {
 					double health = entity.getHealth();
 					entity.remove();
 					entity = null;
+					modelName = tameable.saddleModel;
+					player.getEquipment().getItemInMainHand().setAmount(player.getEquipment().getItemInMainHand().getAmount()-1);
 					
 					spawn(loc);
 					entity.setHealth(health);
 					entity.teleport(loc);
+					tameable.saddled = true;
 				}
 			}
 		} 

@@ -297,11 +297,15 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 	
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) throws ExecutionException, InterruptedException {
+		sendResourcepack(event.getPlayer());
+	}
+	
+	public void sendResourcepack(Player player) throws InterruptedException, ExecutionException {
 		if (!enforceResourcepack) return;
 		ResourcePackInfo packInfo = ResourcePackInfo.resourcePackInfo()
 				.uri(URI.create("https://fancy.lerdorf.com/build.zip"))
 				.computeHashAndBuild().get();
-		Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> event.getPlayer().sendResourcePacks(packInfo), 5);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> player.sendResourcePacks(packInfo), 5);
 	}
 	
 	@EventHandler
@@ -471,6 +475,18 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				// Copy the files from build to expanded_warfare, zip the new resourcepack and update the sha1 hash
 				ProcessBuilder pb = new ProcessBuilder(resourcepackUpdateScript);
 				Process pc = pb.start();
+				Bukkit.getScheduler().runTaskLater(FancyMobs.plugin, () -> {
+					for (Player p : Bukkit.getOnlinePlayers())
+						try {
+							sendResourcepack(p);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (ExecutionException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+				}, 60);
 			} catch (Exception e) {
 				sender.sendMessage("Failed to modify resourcepack: " + e.getLocalizedMessage());
 			}
