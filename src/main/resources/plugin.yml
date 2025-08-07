@@ -1,0 +1,10 @@
+name: FancyMobs
+main: com.lerdorf.fancymobs.FancyMobs
+version: 1.0
+api-version: 1.21
+depend: [NBTAPI]
+commands:
+  fm:
+    description: The FancyMobs command
+    usage: /fm [spawn]
+    permission: fancymob.fm
