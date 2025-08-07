@@ -86,6 +86,9 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 
 	private File configFile;
 	private Map<String, Object> configValues;
+	
+	boolean enforceResourcepack = true;
+	String resourcepackUpdateScript = "/home/carl/KraftySMPTest/update-resource-pack.sh";
 
 	public static Plugin plugin;
 
@@ -222,12 +225,23 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 		}
 
 		// Now parse and update values
-		/*
-		 * try { if (configValues.containsKey("requireBothHandsEmpty"))
-		 * requireBothHandsEmpty = (boolean)configValues.get("requireBothHandsEmpty"); }
-		 * catch (Exception e) { e.printStackTrace(); }
-		 * configValues.put("requireBothHandsEmpty", requireBothHandsEmpty);
-		 */
+		
+		try {
+			if (configValues.containsKey("enforceResourcepack"))
+				enforceResourcepack = (boolean)configValues.get("enforceResourcepack");
+		} catch (Exception e) {
+			
+		}
+		configValues.put("enforceResourcepack", enforceResourcepack);
+		
+		try {
+			if (configValues.containsKey("resourcepackUpdateScript"))
+				resourcepackUpdateScript = (String)configValues.get("resourcepackUpdateScript");
+		} catch (Exception e) {
+			
+		}
+		configValues.put("resourcepackUpdateScript", resourcepackUpdateScript);
+		
 
 		saveConfig(); // Ensure config is up to date
 	}
@@ -283,7 +297,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 	
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) throws ExecutionException, InterruptedException {
-		//if (!getConfig().getBoolean("enable-resource-pack")) return;
+		if (!enforceResourcepack) return;
 		ResourcePackInfo packInfo = ResourcePackInfo.resourcePackInfo()
 				.uri(URI.create("https://fancy.lerdorf.com/build.zip"))
 				.computeHashAndBuild().get();
@@ -455,7 +469,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 		if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
 			try {
 				// Copy the files from build to expanded_warfare, zip the new resourcepack and update the sha1 hash
-				ProcessBuilder pb = new ProcessBuilder("/home/carl/KraftySMPTest/update-resource-pack.sh");
+				ProcessBuilder pb = new ProcessBuilder(resourcepackUpdateScript);
 				Process pc = pb.start();
 			} catch (Exception e) {
 				sender.sendMessage("Failed to modify resourcepack: " + e.getLocalizedMessage());

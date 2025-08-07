@@ -22,8 +22,11 @@ public class Tameable {
 	public void tryTame(Player player) {
 		// TODO Auto-generated method stub
 		ItemStack item = player.getEquipment().getItemInMainHand();
-		if (isTameMaterial(item)) {
-			
+		if (item != null) {
+			if (isTameMaterial(item)) {
+				item.setAmount(item.getAmount()-1);
+				
+			}
 		}
 	}
 	
