@@ -8,6 +8,7 @@ import java.util.HashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -280,9 +281,31 @@ public class FancyMob {
 	public void rightClick(PlayerInteractEntityEvent event) {
 		Player player = event.getPlayer();
 		
-		if (tameable != null && !tameable.tamed) {
-			tameable.tryTame(player);
-		}
+		if (tameable != null) {
+			if (!tameable.tamed) {
+				switch (tameable.tryTame(player)) {
+				case -1: // Wrong item
+					break;
+				case 0: // Right item, unsuccessful
+					event.getRightClicked().getWorld().spawnParticle(Particle.SMOKE, event.getRightClicked().getLocation(), 20, 0.4f, 0.4f, 0.4f, 0.1f);
+					break;
+				case 1: // Tamed!
+					event.getRightClicked().getWorld().spawnParticle(Particle.HEART, event.getRightClicked().getLocation(), 20, 0.4f, 0.4f, 0.4f, 0.1f);
+					break;
+				}
+			} else if (tameable.saddleable && !tameable.saddled) {
+				if (tameable.isCorrectSaddle(player.getEquipment().getItemInMainHand())) {
+					Location loc = entity.getLocation();
+					double health = entity.getHealth();
+					entity.remove();
+					entity = null;
+					
+					spawn(loc);
+					entity.setHealth(health);
+					entity.teleport(loc);
+				}
+			}
+		} 
 		
 	}
 }

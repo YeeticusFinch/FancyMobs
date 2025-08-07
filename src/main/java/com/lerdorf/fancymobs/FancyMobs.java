@@ -188,7 +188,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 						new Ability(Ability.SHAKE, "shaking", 10000, Sound.sound(Key.key("minecraft:entity.wolf.shake"), Source.NEUTRAL, 1.0f, 0.7f)),
 				},
 				new SpawnCondition(new int[] {SpawnCondition.onGround, SpawnCondition.specificFloorTypes, SpawnCondition.specificDimensions}, null, new Material[] {Material.GRASS_BLOCK, Material.DIRT, Material.COARSE_DIRT}, new Environment[] {Environment.NORMAL}),
-				new Tameable(new Material[] {Material.BEEF, Material.PORKCHOP, Material.CHICKEN, Material.MUTTON, Material.RABBIT}, new ItemStack(Material.SADDLE), true)
+				new Tameable(new Material[] {Material.BEEF, Material.PORKCHOP, Material.CHICKEN, Material.MUTTON, Material.RABBIT}, new ItemStack(Material.SADDLE), true, "suchomimmus.saddle")
 				));
 		
 	}

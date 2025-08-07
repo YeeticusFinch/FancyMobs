@@ -12,22 +12,53 @@ public class Tameable {
 	public ItemStack saddleItem;
 	public boolean saddleable;
 	public boolean tamed = false;
+	public float tameChance = 0.3f;
+	public String saddleModel;
+	public boolean saddled = false;
 	
-	public Tameable(Material[] tameMaterial, ItemStack saddleItem, boolean saddleable) {
+	public Tameable(Material[] tameMaterial, ItemStack saddleItem, boolean saddleable, String saddleModel) {
 		this.tameMaterial = tameMaterial;
 		this.saddleItem = saddleItem;
 		this.saddleable = saddleable;
 	}
+	
+	public Tameable(Material[] tameMaterial, ItemStack saddleItem, boolean saddleable, String saddleModel, float tameChance) {
+		this.tameMaterial = tameMaterial;
+		this.saddleItem = saddleItem;
+		this.saddleable = saddleable;
+		this.tameChance = tameChance;
+	}
 
-	public void tryTame(Player player) {
+	public int tryTame(Player player) {
 		// TODO Auto-generated method stub
 		ItemStack item = player.getEquipment().getItemInMainHand();
 		if (item != null) {
 			if (isTameMaterial(item)) {
 				item.setAmount(item.getAmount()-1);
-				
+				if (Math.random() < tameChance) {
+					tamed = true;
+					return 1;
+				} else {
+					return 0;
+				}
 			}
 		}
+		return -1;
+	}
+	
+	public boolean isCorrectSaddle(ItemStack item) {
+		if (item != null && saddleItem != null && saddleable) {
+			if (item.getType() == saddleItem.getType()) {
+				if ((item.getItemMeta().getItemModel() != null) == (saddleItem.getItemMeta().getItemModel() != null)) {
+					if (item.getItemMeta().getItemModel() != null && item.getItemMeta().getItemModel().getNamespace().equalsIgnoreCase(saddleItem.getItemMeta().getItemModel().getNamespace())) {
+						return true;
+					} else if (item.getItemMeta().getItemModel() == null) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 	
 	boolean isTameMaterial(ItemStack item) {
