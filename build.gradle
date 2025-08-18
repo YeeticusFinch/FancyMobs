@@ -14,16 +14,30 @@ java {
 }
 
 repositories {
+    // PaperMC repo for dev-bundle
+    maven {
+        url = uri("https://repo.papermc.io/repository/maven-public/")
+    }
+
+    // CodeMC repos (NBTAPI, BetterModel, etc.)
     maven { url = 'https://repo.codemc.org/repository/maven-public/' }
     maven { url = 'https://repo.codemc.io/repository/maven-public/' }
+
+    // Maven Central
     mavenCentral()
+
+    // WorldEdit repo (HTTP only, allow insecure)
+    maven {
+	    url = uri("https://maven.enginehub.org/repo/")
+	}
 }
 
 // For Minecraft 1.21.8
 dependencies {
     paperweight.paperDevBundle("1.21.8-R0.1-SNAPSHOT")
     compileOnly 'de.tr7zw:item-nbt-api-plugin:2.15.1'
-    compileOnly("io.github.toxicity188:BetterModel:1.10.3")
+    compileOnly("io.github.toxicity188:BetterModel:1.11.0")
+    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.3.16-SNAPSHOT")
     //implementation("io.papermc.paper:paper-mojangapi:1.21.8-R0.1-SNAPSHOT") // not always available
     //paperDevBundle("1.21.8-R0.1-SNAPSHOT")
     // If you're using Folia or a fork:

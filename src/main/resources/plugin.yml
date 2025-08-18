@@ -3,6 +3,7 @@ main: com.lerdorf.fancymobs.FancyMobs
 version: 1.0
 api-version: 1.21
 depend: [NBTAPI]
+softdepend: [WorldEdit]
 commands:
   fm:
     description: The FancyMobs command

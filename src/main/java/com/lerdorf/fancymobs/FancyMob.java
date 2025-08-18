@@ -3,7 +3,10 @@ package com.lerdorf.fancymobs;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -264,14 +267,10 @@ public class FancyMob {
 		}
 	}
 	
-	public ArrayList<Entity> getPassengers() {
-		ArrayList<Entity> result = new ArrayList<Entity>();
-		for (RenderedBone bone : tracker.bones()) {
-			if (bone.getHitBox() != null && bone.getHitBox().source() != null) {
-				result.addAll(bone.getHitBox().source().getPassengers());
-			}
-		}
-		return result;
+	public List<UUID> passengers = new ArrayList<UUID>();
+	
+	public List<UUID> getPassengers() {
+	    return passengers;
 	}
 	
 	private boolean isDamageHitboxBone(RenderedBone bone) {
@@ -283,6 +282,21 @@ public class FancyMob {
 		if (spawnCondition == null)
 			return false;
 		return spawnCondition.canSpawn(tryLoc);
+	}
+	
+	public void mount(Entity passenger) {
+		passengers.add(passenger.getUniqueId());
+		if (abilities != null) {
+			for (Ability a : abilities) {
+				if (a.id == Ability.SLEEP || a.id == Ability.SIT) {
+					a.act(this, null, false);
+				}
+			}
+		}
+	}
+	
+	public void dismount(Entity passenger) {
+		passengers.remove(passenger.getUniqueId());
 	}
 
 	public void rightClick(PlayerInteractEntityEvent event) {

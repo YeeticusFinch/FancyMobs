@@ -29,6 +29,12 @@ import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+import kr.toxicity.model.api.animation.AnimationIterator;
+import kr.toxicity.model.api.animation.AnimationModifier;
+import kr.toxicity.model.api.tracker.TrackerModifier;
+import kr.toxicity.model.api.util.FunctionUtil;
+import kr.toxicity.model.api.util.function.FloatConstantSupplier;
+
 public class Ability {
 
 	public static final int RED_LASER = 0;
@@ -147,9 +153,20 @@ public class Ability {
 		case SPRINT: {
 			if (force || distance > 3 && distance < 30 && !mob.entity.getScoreboardTags().contains("sprinting")) {
 				Collection<PotionEffect> newEffects = new ArrayList<>();
-				newEffects.add(new PotionEffect(PotionEffectType.SLOWNESS, 20*20, 3, true, false));
+				newEffects.add(new PotionEffect(PotionEffectType.SPEED, 20*20, 3, true, false));
 				mob.entity.addPotionEffects(newEffects);
-				mob.tracker.animate(anim);
+				
+				var adapter = mob.tracker.registry().adapter();
+				TrackerModifier modifier = mob.tracker.modifier();
+				var damageTickProvider = FunctionUtil.throttleTickFloat(adapter::damageTick);
+				 var walkSupplier = FunctionUtil.throttleTickBoolean(() -> adapter.onWalk() || damageTickProvider.getAsFloat() > 0.25 || mob.tracker.bones().stream().anyMatch(e -> {
+			            var hitBox = e.getHitBox();
+			            return hitBox != null && hitBox.onWalk();
+			        }));
+			        var walkSpeedSupplier = modifier.damageAnimation() ? FunctionUtil.throttleTickFloat(() -> adapter.walkSpeed() + 4F * (float) Math.sqrt(damageTickProvider.getAsFloat())) : FloatConstantSupplier.ONE;
+			        mob.tracker.animate(anim, new AnimationModifier(walkSupplier, 6, 0, AnimationIterator.Type.LOOP, walkSpeedSupplier));
+				//mob.tracker.animate(anim);
+				
 				mob.entity.addScoreboardTag("sprinting");
 				Bukkit.getScheduler().runTaskLater(FancyMobs.plugin, () -> {
 					mob.tracker.stopAnimation(anim);
