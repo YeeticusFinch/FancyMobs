@@ -73,9 +73,17 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.inventory.CampfireRecipe;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.EquipmentSlotGroup;
+import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.RecipeChoice;
+import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.SmokingRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.components.EquippableComponent;
+import org.bukkit.inventory.meta.components.FoodComponent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -99,7 +107,7 @@ import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
-
+import net.minecraft.world.item.equipment.Equippable;
 import kr.toxicity.model.api.*;
 import kr.toxicity.model.api.bone.RenderedBone;
 import kr.toxicity.model.api.event.DismountModelEvent;
@@ -111,6 +119,82 @@ import net.kyori.adventure.sound.Sound.Source;
 
 public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 
+	private static final ItemStack rawDinosaurMeat = new ItemStack(Material.ROTTEN_FLESH, 1) {{
+		ItemMeta meta = getItemMeta();
+		FoodComponent food = meta.getFood();
+		food.setSaturation(6);
+		food.setNutrition(5);
+		meta.setFood(food);
+		meta.setItemModel(NamespacedKey.fromString("yeet:raw_dinosaur_meat"));
+		meta.setDisplayName(ChatColor.GREEN + "Raw Dinosaur Meat");
+		setItemMeta(meta);
+	}};
+	private static final ItemStack cookedDinosaurMeat = new ItemStack(Material.COOKED_BEEF, 1) {{
+		ItemMeta meta = getItemMeta();
+		FoodComponent food = meta.getFood();
+		food.setSaturation(10);
+		food.setNutrition(11);
+		meta.setFood(food);
+		meta.setItemModel(NamespacedKey.fromString("yeet:cooked_dinosaur_meat"));
+		meta.setDisplayName(ChatColor.GREEN + "Cooked Dinosaur Meat");
+		setItemMeta(meta);
+	}};
+	private static final ItemStack dinosaurCarapace = new ItemStack(Material.LEATHER, 1) {{
+		ItemMeta meta = getItemMeta();
+		meta.setItemModel(NamespacedKey.fromString("yeet:dinosaur_carapace"));
+		meta.setDisplayName(ChatColor.GREEN + "Dinosaur Carapace");
+		setItemMeta(meta);
+	}};
+	private static final ItemStack dinosaurHelmet = new ItemStack(Material.CHAINMAIL_HELMET, 1) {{
+		ItemMeta meta = getItemMeta();
+		meta.setItemModel(NamespacedKey.fromString("dinosaur_helmet"));
+		meta.setDisplayName(ChatColor.GREEN + "Dinosaur Helmet");
+		
+		meta.addAttributeModifier(Attribute.ARMOR, new AttributeModifier(new NamespacedKey(plugin, "dinosaur_helmet_armor"), 2.0, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD));
+		meta.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, new AttributeModifier(new NamespacedKey(plugin, "dinosaur_helmet_toughness"), 2.0, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD));
+		meta.addAttributeModifier(Attribute.MOVEMENT_EFFICIENCY, new AttributeModifier(new NamespacedKey(plugin, "dinosaur_helmet_efficiency"), 0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD));
+		
+		setItemMeta(meta);
+		Util.setEquippable(this, "dinosaur");
+	}};
+	private static final ItemStack dinosaurChestplate= new ItemStack(Material.CHAINMAIL_HELMET, 1) {{
+		ItemMeta meta = getItemMeta();
+		meta.setItemModel(NamespacedKey.fromString("dinosaur_chestplate"));
+		meta.setDisplayName(ChatColor.GREEN + "Dinosaur Chestplate");
+		
+		meta.addAttributeModifier(Attribute.ARMOR, new AttributeModifier(new NamespacedKey(plugin, "dinosaur_chestplate_armor"), 5.0, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.CHEST));
+		meta.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, new AttributeModifier(new NamespacedKey(plugin, "dinosaur_chestplate_toughness"), 2.0, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.CHEST));
+		meta.addAttributeModifier(Attribute.MOVEMENT_EFFICIENCY, new AttributeModifier(new NamespacedKey(plugin, "dinosaur_chestplate_efficiency"), 0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.CHEST));
+		
+		setItemMeta(meta);
+		Util.setEquippable(this, "dinosaur");
+	}};
+	private static final ItemStack dinosaurLeggings= new ItemStack(Material.CHAINMAIL_HELMET, 1) {{
+		ItemMeta meta = getItemMeta();
+		meta.setItemModel(NamespacedKey.fromString("dinosaur_chestplate"));
+		meta.setDisplayName(ChatColor.GREEN + "Dinosaur Chestplate");
+		
+		meta.addAttributeModifier(Attribute.ARMOR, new AttributeModifier(new NamespacedKey(plugin, "dinosaur_leggings_armor"), 4.5, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.LEGS));
+		meta.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, new AttributeModifier(new NamespacedKey(plugin, "dinosaur_leggings_toughness"), 2.0, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.LEGS));
+		meta.addAttributeModifier(Attribute.MOVEMENT_EFFICIENCY, new AttributeModifier(new NamespacedKey(plugin, "dinosaur_leggings_efficiency"), 0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.LEGS));
+		
+		setItemMeta(meta);
+		Util.setEquippable(this, "dinosaur");
+	}};
+	private static final ItemStack dinosaurBoots = new ItemStack(Material.CHAINMAIL_HELMET, 1) {{
+		ItemMeta meta = getItemMeta();
+		meta.setItemModel(NamespacedKey.fromString("dinosaur_boots"));
+		meta.setDisplayName(ChatColor.GREEN + "Dinosaur Boots");
+		
+		meta.addAttributeModifier(Attribute.ARMOR, new AttributeModifier(new NamespacedKey(plugin, "dinosaur_boots_armor"), 1.5, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.FEET));
+		meta.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, new AttributeModifier(new NamespacedKey(plugin, "dinosaur_boots_toughness"), 2.0, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.FEET));
+		meta.addAttributeModifier(Attribute.MOVEMENT_EFFICIENCY, new AttributeModifier(new NamespacedKey(plugin, "dinosaur_boots_efficiency"), 0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.FEET));
+		
+		setItemMeta(meta);
+		Util.setEquippable(this, "dinosaur");
+	}};
+	private static final ItemStack ironPlate = Drop.getFromLoot("wep:misc/plates/iron_plate");
+	
 	private File configFile;
 	private Map<String, Object> configValues;
 	
@@ -122,6 +206,94 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 	public HashMap<String, FancyMob> mobRegistry = new HashMap<>();
 	public HashMap<UUID, FancyMob> fancyMobs = new HashMap<>();
 
+	public void loadCustomItems() {
+		
+		 // Furnace recipe
+	    NamespacedKey furnaceKey = new NamespacedKey(this, "cooked_dino_furnace");
+	    FurnaceRecipe furnaceRecipe = new FurnaceRecipe(
+	        furnaceKey,
+	        cookedDinosaurMeat, // result
+	        new RecipeChoice.ExactChoice(rawDinosaurMeat), // ingredient
+	        0.35f, // exp reward
+	        200    // cook time in ticks (10s)
+	    );
+	    Bukkit.addRecipe(furnaceRecipe);
+
+	    // Smoker recipe (twice as fast normally, so cookTime smaller)
+	    NamespacedKey smokerKey = new NamespacedKey(this, "cooked_dino_smoker");
+	    SmokingRecipe smokingRecipe = new SmokingRecipe(
+	        smokerKey,
+	        cookedDinosaurMeat,
+	        new RecipeChoice.ExactChoice(rawDinosaurMeat),
+	        0.35f,
+	        100    // 5s
+	    );
+	    Bukkit.addRecipe(smokingRecipe);
+
+	    // Campfire recipe
+	    NamespacedKey campfireKey = new NamespacedKey(this, "cooked_dino_campfire");
+	    CampfireRecipe campfireRecipe = new CampfireRecipe(
+	        campfireKey,
+	        cookedDinosaurMeat,
+	        new RecipeChoice.ExactChoice(rawDinosaurMeat),
+	        0.35f,
+	        600    // 30s (default)
+	    );
+	    Bukkit.addRecipe(campfireRecipe);
+		
+		
+		
+		NamespacedKey key = new NamespacedKey(plugin, "dinosaur_helmet");
+
+		ShapedRecipe recipe = new ShapedRecipe(key, dinosaurHelmet);
+		recipe.shape(
+				"CIC", 
+				"C C"
+				);
+		recipe.setIngredient('C', new RecipeChoice.ExactChoice(dinosaurCarapace));
+		recipe.setIngredient('I', Material.IRON_INGOT);
+
+		Bukkit.addRecipe(recipe);
+		
+
+		key = new NamespacedKey(plugin, "dinosaur_chestplate");
+
+		recipe = new ShapedRecipe(key, dinosaurChestplate);
+		recipe.shape(
+				"C C", 
+				"CIC",
+				"CCC");
+		recipe.setIngredient('C', new RecipeChoice.ExactChoice(dinosaurCarapace));
+		recipe.setIngredient('I', new RecipeChoice.ExactChoice(ironPlate));
+
+		Bukkit.addRecipe(recipe);
+		
+		
+
+		key = new NamespacedKey(plugin, "dinosaur_leggings");
+
+		recipe = new ShapedRecipe(key, dinosaurLeggings);
+		recipe.shape(
+				"CCC", 
+				"C C",
+				"C C");
+		recipe.setIngredient('C', new RecipeChoice.ExactChoice(dinosaurCarapace));
+
+		Bukkit.addRecipe(recipe);
+		
+
+
+		key = new NamespacedKey(plugin, "dinosaur_boots");
+
+		recipe = new ShapedRecipe(key, dinosaurBoots);
+		recipe.shape(
+				"C C", 
+				"C C");
+		recipe.setIngredient('C', new RecipeChoice.ExactChoice(dinosaurCarapace));
+
+		Bukkit.addRecipe(recipe);
+	}
+	
 	public void loadMobRegistry() {
 		mobRegistry.put("warrior25", new FancyMob("Warrior25", 100, 0.2f, 1, "warrior25.generic", EntityType.IRON_GOLEM,
 				FancyMob.HOSTILE, new HashMap<>() {
@@ -155,7 +327,13 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 						new Ability(Ability.THROW_SICKLE, "throw", 2000),
 						new Ability(Ability.SPRINT, "sprint", 20000)
 				},
-				null, null
+				null, null,
+				new Drop[] {
+						new Drop("wep:misc/heavy_plate/golden_heavy_plate", 0.1f, 0, 1),
+						new Drop("wep:misc/plates/golden_plate", 0.1f, 0, 3),
+						new Drop("wep:weapons/sickle/golden_sickle", 0.2f, 0, 1),
+						new Drop("wep:weapons/warhammer/golden_warhammer", 0.2f, 0, 1)
+				}, 2, 6
 				));
 		mobRegistry.put("barinasuchus", new FancyMob("Barinasuchus", 40, 0.2f, 0.7f, "barinasuchus", EntityType.POLAR_BEAR,
 				FancyMob.NEUTRAL, new HashMap<>() {
@@ -189,7 +367,11 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 						new Ability(Ability.SIT, "sitting", 2000)
 				},
 				new SpawnCondition(new int[] {SpawnCondition.onGround, SpawnCondition.specificFloorTypes, SpawnCondition.specificDimensions}, null, new Material[] {Material.GRASS_BLOCK, Material.DIRT, Material.COARSE_DIRT}, new Environment[] {Environment.NORMAL}),
-				null
+				null,
+				new Drop[] {
+						new Drop(dinosaurCarapace, 0.1f, 1, 2),
+						new Drop(rawDinosaurMeat, 0.1f, 1, 2)
+				}, 0, 2
 				));
 
 		mobRegistry.put("suchomimmus", new FancyMob("Suchomimmus", 35, 0.3f, 0.6f, "suchomimmus.generic", EntityType.POLAR_BEAR,
@@ -222,7 +404,10 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 						new Ability(Ability.SPRINT, "sprinting", 5000)
 				},
 				new SpawnCondition(new int[] {SpawnCondition.onGround, SpawnCondition.specificFloorTypes, SpawnCondition.specificDimensions}, null, new Material[] {Material.GRASS_BLOCK, Material.DIRT, Material.COARSE_DIRT}, new Environment[] {Environment.NORMAL}),
-				new Tameable(new Material[] {Material.BEEF, Material.PORKCHOP, Material.CHICKEN, Material.MUTTON, Material.RABBIT}, new ItemStack(Material.SADDLE), true, "suchomimmus.saddle")
+				new Tameable(new Material[] {Material.BEEF, Material.PORKCHOP, Material.CHICKEN, Material.MUTTON, Material.RABBIT}, new ItemStack(Material.SADDLE), true, "suchomimmus.saddle"),
+				new Drop[] {
+						new Drop(rawDinosaurMeat, 0.3f, 0, 2)
+				}, 0, 2
 				));
 		
 
@@ -252,7 +437,133 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 						//new Ability(Ability.SIT, "sitting", 2000),
 				},
 				new SpawnCondition(new int[] {SpawnCondition.onGround, SpawnCondition.specificDimensions, SpawnCondition.dark, SpawnCondition.specificBiomes}, new Biome[] {Biome.DRIPSTONE_CAVES, Biome.LUSH_CAVES}, new Material[] {Material.GRASS_BLOCK, Material.DIRT, Material.COARSE_DIRT}, new Environment[] {Environment.NORMAL}),
-				null
+				null,
+				new Drop[] {
+						new Drop(new ItemStack(Material.LEATHER), 0.4f, 0, 1)
+				}, 1, 3
+				));
+		
+		mobRegistry.put("stegosaurus", new FancyMob("Stegosaurus", 45, 0.25f, 0.75f, "stegosauruss", EntityType.POLAR_BEAR,
+				FancyMob.NEUTRAL, new HashMap<>() {
+					{
+						put(Attribute.ARMOR, 5d);
+						//put(Attribute.WATER_MOVEMENT_EFFICIENCY, 0.5);
+					}
+				},
+				new PotionEffect[] {
+						//new PotionEffect(PotionEffectType.WATER_BREATHING, Integer.MAX_VALUE, 3, true, false)
+					},
+				Sound.sound(Key.key("yeet:barina_idle"), Source.NEUTRAL, 1.0f, 1.0f),
+				Sound.sound(Key.key("yeet:barina_hurt"), Source.NEUTRAL, 1.0f, 1.0f),
+				Sound.sound(Key.key("yeet:barina_death"), Source.NEUTRAL, 1.0f, 1.0f),
+				70,
+				new Attack[] { 
+						new Attack("attack", 6, new HashMap<>() {
+								{
+									//put(Attack.SLOWNESS, 2d);
+								}
+							}, 4, 900
+						)
+				},
+				new Ability[] {
+						new Ability(Ability.ROAR, "warn", 2000)
+				},
+				new SpawnCondition(new int[] {SpawnCondition.onGround, SpawnCondition.specificFloorTypes, SpawnCondition.specificDimensions}, null, new Material[] {Material.GRASS_BLOCK, Material.DIRT, Material.COARSE_DIRT}, new Environment[] {Environment.NORMAL}),
+				null,
+				new Drop[] {
+						new Drop(dinosaurCarapace, 0.1f, 0, 1),
+						new Drop(rawDinosaurMeat, 0.1f, 1, 2)
+				}, 0, 2
+				));
+
+		mobRegistry.put("neovenator", new FancyMob("Neovenator", 40, 0.3f, 0.75f, "Neovenator_Dinosauria", EntityType.POLAR_BEAR,
+				FancyMob.NEUTRAL, new HashMap<>() {
+					{
+						put(Attribute.ARMOR, 5d);
+						put(Attribute.WATER_MOVEMENT_EFFICIENCY, 0.5);
+					}
+				},
+				new PotionEffect[] {
+						//new PotionEffect(PotionEffectType.WATER_BREATHING, Integer.MAX_VALUE, 3, true, false)
+					},
+				Sound.sound(Key.key("yeet:spino_idle"), Source.HOSTILE, 1.0f, 1.4f),
+				Sound.sound(Key.key("yeet:spino_hurt"), Source.HOSTILE, 1.0f, 1.4f),
+				Sound.sound(Key.key("yeet:spino_death"), Source.HOSTILE, 1.0f, 1.4f),
+				70,
+				new Attack[] { 
+						new Attack("attack_bite", 7, new HashMap<>() {
+								{
+									//put(Attack.SLOWNESS, 2d);
+								}
+							}, 4, 900
+						),
+						new Attack("attack_bite_2", 8, new HashMap<>() {
+							{
+								put(Attack.SLOWNESS, 4d);
+							}
+						}, 4, 1900
+					),
+						new Attack("slap_attack", 6, new HashMap<>() {
+							{
+								put(Attack.KNOCKBACK, 2d);
+							}
+						}, 3, 900
+					),
+						new Attack("tail_attack", 8, new HashMap<>() {
+							{
+								put(Attack.SWEEP, 1d);
+								put(Attack.SLOWNESS, 2d);
+							}
+						}, 3, 2000
+					),
+						new Attack("kick_attack", 7, new HashMap<>() {
+							{
+								put(Attack.KNOCKBACK, 2d);
+								put(Attack.SLOWNESS, 2d);
+							}
+						}, 4, 1600
+					)
+				},
+				new Ability[] {
+						new Ability(Ability.SIT, "sit", 6000),
+						new Ability(Ability.SLEEP, "sleep", 20000)
+				},
+				new SpawnCondition(new int[] {SpawnCondition.onGround, SpawnCondition.specificFloorTypes, SpawnCondition.specificDimensions}, null, new Material[] {Material.GRASS_BLOCK, Material.DIRT, Material.COARSE_DIRT}, new Environment[] {Environment.NORMAL}),
+				null,
+				new Drop[] {
+						new Drop(rawDinosaurMeat, 0.1f, 1, 2)
+				}, 2, 6
+				));
+		
+		mobRegistry.put("corythoraptor", new FancyMob("Corythoraptor", 8, 0.4f, 0.4f, "Corythoraptor.generic", EntityType.PIG,
+				FancyMob.NEUTRAL, new HashMap<>() {
+					{
+						put(Attribute.ARMOR, 5d);
+						put(Attribute.WATER_MOVEMENT_EFFICIENCY, 0.5);
+					}
+				},
+				new PotionEffect[] {
+						//new PotionEffect(PotionEffectType.WATER_BREATHING, Integer.MAX_VALUE, 3, true, false)
+					},
+				Sound.sound(Key.key("yeet:spino_idle"), Source.VOICE, 1.0f, 2f),
+				Sound.sound(Key.key("yeet:spino_hurt"), Source.VOICE, 1.0f, 2f),
+				Sound.sound(Key.key("yeet:spino_death"), Source.VOICE, 1.0f, 2f),
+				70,
+				new Attack[] { 
+						
+				},
+				new Ability[] {
+						new Ability(Ability.SIT, "shake", 1000),
+						new Ability(Ability.SPRINT, "run", 2000),
+						new Ability(Ability.SIT, "sit", 2000),
+						new Ability(Ability.SLEEP, "sleep", 20000)
+				},
+				new SpawnCondition(new int[] {SpawnCondition.onGround, SpawnCondition.specificFloorTypes, SpawnCondition.specificDimensions}, null, new Material[] {Material.GRASS_BLOCK, Material.DIRT, Material.COARSE_DIRT}, new Environment[] {Environment.NORMAL}),
+				null,
+				new Drop[] {
+						new Drop(rawDinosaurMeat, 0.1f, 1, 1),
+						new Drop(new ItemStack(Material.FEATHER), 0.6f, 0, 2)
+				}, 0, 3
 				));
 		
 	}
@@ -337,6 +648,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 		loadSchematic("warrior24_factory.schem");
 
 		loadMobRegistry();
+		loadCustomItems();
 
 		startSpawnLoop();
 
@@ -516,8 +828,22 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 	public void onEntityDeath(EntityDeathEvent event) {
 		if (event.getEntity() instanceof LivingEntity le && le.getScoreboardTags().contains("fm_mob")) {
 				FancyMob mob = getFancyMob(le);
-				if (mob != null)
+				int looting = 0;
+				if (event.getDamageSource().getCausingEntity() instanceof LivingEntity attacker && attacker != null && attacker.isValid()) {
+					if (attacker.getEquipment().getItemInMainHand() != null && attacker.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.LOOTING)) {
+						looting = attacker.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.LOOTING);
+					}
+				}
+				
+				if (mob != null) {
 					mob.death();
+					event.setDroppedExp(mob.getDroppedExp());
+					event.getDrops().clear();
+					for (Drop drop : mob.drops) {
+						ItemStack newDrop = drop.getDrop(looting);
+						event.getDrops().add(newDrop.clone());
+					}
+				}
 		}
 	}
 

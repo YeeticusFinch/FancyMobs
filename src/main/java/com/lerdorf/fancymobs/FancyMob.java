@@ -50,6 +50,8 @@ public class FancyMob {
 	public int maxHp = 20;
 	public float moveSpeed = 0.1f;
 	public float scale = 1;
+	public int minXp = 0;
+	public int maxXp = 1;
 	
 	public EntityTracker tracker;
 	public String modelName;
@@ -70,12 +72,13 @@ public class FancyMob {
 	
 	HashMap<Attribute, Double> attributes = new HashMap<>();
 	PotionEffect[] effects;
+	Drop[] drops;
 	
 	SpawnCondition spawnCondition;
 	
 	Tameable tameable;
 	
-	public FancyMob(String name, int maxHp, float moveSpeed, float scale, String modelName, EntityType baseType, int alignment, HashMap<Attribute, Double> attributes, PotionEffect[] effects, Sound ambientSound, Sound hurtSound, Sound deathSound, int aggroRange, Attack[] attacks, Ability[] abilities, SpawnCondition spawnCondition, Tameable tameable) {
+	public FancyMob(String name, int maxHp, float moveSpeed, float scale, String modelName, EntityType baseType, int alignment, HashMap<Attribute, Double> attributes, PotionEffect[] effects, Sound ambientSound, Sound hurtSound, Sound deathSound, int aggroRange, Attack[] attacks, Ability[] abilities, SpawnCondition spawnCondition, Tameable tameable, Drop[] drops, int minXp, int maxXp) {
 		this.name = name;
 		this.maxHp = maxHp;
 		this.moveSpeed = moveSpeed;
@@ -93,10 +96,13 @@ public class FancyMob {
 		this.aggroRange = aggroRange;
 		this.spawnCondition = spawnCondition;
 		this.tameable = tameable;
+		this.drops = drops;
+		this.minXp = minXp;
+		this.maxXp = maxXp;
 	}
 	
 	public FancyMob clone() {
-		return new FancyMob(name, maxHp, moveSpeed, scale, modelName, baseType, alignment, attributes, effects, ambientSound, hurtSound, deathSound, aggroRange, attacks, abilities, spawnCondition, tameable);
+		return new FancyMob(name, maxHp, moveSpeed, scale, modelName, baseType, alignment, attributes, effects, ambientSound, hurtSound, deathSound, aggroRange, attacks, abilities, spawnCondition, tameable, drops, minXp, maxXp);
 	}
 	
 	public void setup(LivingEntity le) {
@@ -334,5 +340,11 @@ public class FancyMob {
 			}
 		} 
 		
+	}
+
+	public int getDroppedExp() {
+		// TODO Auto-generated method stub
+		
+		return (int)(Math.random()*(maxXp-minXp)+minXp);
 	}
 }
