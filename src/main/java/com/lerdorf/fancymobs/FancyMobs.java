@@ -307,7 +307,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 	}
 	
 	public void loadMobRegistry() {
-		mobRegistry.put("warrior25", new FancyMob("Warrior25", 100, 0.2f, 1, "warrior25.generic", EntityType.IRON_GOLEM,
+		mobRegistry.put("warrior25", new FancyMob("Warrior25", 100, 0.2f, 1, new String[] {"warrior25.generic"}, EntityType.IRON_GOLEM,
 				FancyMob.HOSTILE, new HashMap<>() {
 					{
 						put(Attribute.ARMOR, 10d);
@@ -347,7 +347,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 						new Drop("wep:weapons/warhammer/golden_warhammer", 0.2f, 0, 1)
 				}, 2, 6
 				));
-		mobRegistry.put("barinasuchus", new FancyMob("Barinasuchus", 40, 0.2f, 0.7f, "barinasuchus", EntityType.POLAR_BEAR,
+		mobRegistry.put("barinasuchus", new FancyMob("Barinasuchus", 40, 0.2f, 0.7f, new String[] {"barinasuchus"}, EntityType.POLAR_BEAR,
 				FancyMob.NEUTRAL, new HashMap<>() {
 					{
 						put(Attribute.ARMOR, 15d);
@@ -386,7 +386,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				}, 0, 2
 				));
 
-		mobRegistry.put("suchomimmus", new FancyMob("Suchomimmus", 35, 0.3f, 0.6f, "suchomimmus.generic", EntityType.POLAR_BEAR,
+		mobRegistry.put("suchomimmus", new FancyMob("Suchomimmus", 35, 0.3f, 0.6f, new String[] {"suchomimmus.generic"}, EntityType.POLAR_BEAR,
 				FancyMob.NEUTRAL, new HashMap<>() {
 					{
 						put(Attribute.ARMOR, 5d);
@@ -423,7 +423,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				));
 		
 
-		mobRegistry.put("ogre", new FancyMob("Ogre", 30, 0.2f, 1f, "ogre", EntityType.HUSK,
+		mobRegistry.put("ogre", new FancyMob("Ogre", 30, 0.2f, 1f, new String[] {"ogre"}, EntityType.HUSK,
 				FancyMob.HOSTILE, new HashMap<>() {
 					{
 						put(Attribute.ARMOR, 5d);
@@ -455,7 +455,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				}, 1, 3
 				));
 		
-		mobRegistry.put("stegosaurus", new FancyMob("Stegosaurus", 45, 0.25f, 0.75f, "stegosauruss", EntityType.POLAR_BEAR,
+		mobRegistry.put("stegosaurus", new FancyMob("Stegosaurus", 45, 0.25f, 0.75f, new String[] {"stegosauruss"}, EntityType.POLAR_BEAR,
 				FancyMob.NEUTRAL, new HashMap<>() {
 					{
 						put(Attribute.ARMOR, 5d);
@@ -488,7 +488,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				}, 0, 2
 				));
 
-		mobRegistry.put("neovenator", new FancyMob("Neovenator", 40, 0.3f, 0.75f, "Neovenator_Dinosauria", EntityType.POLAR_BEAR,
+		mobRegistry.put("neovenator", new FancyMob("Neovenator", 40, 0.3f, 0.75f, new String[] {"neovenator_dinosauria", "neovenator_dinosauria_2", "neovenator_dinosauria_3", "neovenator_dinosauria_4", "neovenator_dinosauria_5"}, EntityType.POLAR_BEAR,
 				FancyMob.HOSTILE, new HashMap<>() {
 					{
 						put(Attribute.ARMOR, 5d);
@@ -498,9 +498,9 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				new PotionEffect[] {
 						//new PotionEffect(PotionEffectType.WATER_BREATHING, Integer.MAX_VALUE, 3, true, false)
 					},
-				Sound.sound(Key.key("yeet:spino_idle"), Source.HOSTILE, 1.0f, 1.4f),
-				Sound.sound(Key.key("yeet:spino_hurt"), Source.HOSTILE, 1.0f, 1.4f),
-				Sound.sound(Key.key("yeet:spino_death"), Source.HOSTILE, 1.0f, 1.4f),
+				Sound.sound(Key.key("yeet:neo_idle"), Source.HOSTILE, 1.0f, 1f),
+				Sound.sound(Key.key("yeet:neo_hurt"), Source.HOSTILE, 1.0f, 1f),
+				Sound.sound(Key.key("yeet:neo_death"), Source.HOSTILE, 1.0f, 1f),
 				70,
 				new Attack[] { 
 						new Attack("attack_bite", 7, new HashMap<>() {
@@ -547,7 +547,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				}, 2, 6
 				));
 		
-		mobRegistry.put("corythoraptor", new FancyMob("Corythoraptor", 8, 0.4f, 0.4f, "Corythoraptor.generic", EntityType.PIG,
+		mobRegistry.put("corythoraptor", new FancyMob("Corythoraptor", 8, 0.4f, 0.4f, new String[] {"corythoraptor.generic"}, EntityType.PIG,
 				FancyMob.PEACEFUL, new HashMap<>() {
 					{
 						put(Attribute.ARMOR, 5d);
@@ -557,9 +557,9 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				new PotionEffect[] {
 						//new PotionEffect(PotionEffectType.WATER_BREATHING, Integer.MAX_VALUE, 3, true, false)
 					},
-				Sound.sound(Key.key("yeet:spino_idle"), Source.VOICE, 1.0f, 2f),
-				Sound.sound(Key.key("yeet:spino_hurt"), Source.VOICE, 1.0f, 2f),
-				Sound.sound(Key.key("yeet:spino_death"), Source.VOICE, 1.0f, 2f),
+				Sound.sound(Key.key("yeet:cory_idle"), Source.VOICE, 1.0f, 1f),
+				Sound.sound(Key.key("yeet:cory_hurt"), Source.VOICE, 1.0f, 1f),
+				Sound.sound(Key.key("yeet:cory_hurt"), Source.VOICE, 1.0f, 1f),
 				70,
 				new Attack[] { 
 						
@@ -578,7 +578,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				}, 0, 3
 				));
 		
-		mobRegistry.put("thalassodromeu", new FancyMob("Thalassodromeu", 20, 0.3f, 0.6f, "Thalassodromeu_Dinosauria", EntityType.PARROT,
+		mobRegistry.put("thalassodromeu", new FancyMob("Thalassodromeu", 20, 0.3f, 0.6f, new String[] {"thalassodromeu_dinosauria", "thalassodromeu_dinosauria_2", "thalassodromeu_dinosauria_3", "thalassodromeu_dinosauria_4", "thalassodromeu_dinosauria_5"}, EntityType.PARROT,
 				FancyMob.HOSTILE, new HashMap<>() {
 					{
 						put(Attribute.ARMOR, 5d);

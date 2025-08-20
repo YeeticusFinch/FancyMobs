@@ -54,7 +54,7 @@ public class FancyMob {
 	public int maxXp = 1;
 	
 	public EntityTracker tracker;
-	public String modelName;
+	public String[] modelName;
 	public LivingEntity entity;
 	
 	public EntityType baseType;
@@ -78,7 +78,7 @@ public class FancyMob {
 	
 	Tameable tameable;
 	
-	public FancyMob(String name, int maxHp, float moveSpeed, float scale, String modelName, EntityType baseType, int alignment, HashMap<Attribute, Double> attributes, PotionEffect[] effects, Sound ambientSound, Sound hurtSound, Sound deathSound, int aggroRange, Attack[] attacks, Ability[] abilities, SpawnCondition spawnCondition, Tameable tameable, Drop[] drops, int minXp, int maxXp) {
+	public FancyMob(String name, int maxHp, float moveSpeed, float scale, String[] modelName, EntityType baseType, int alignment, HashMap<Attribute, Double> attributes, PotionEffect[] effects, Sound ambientSound, Sound hurtSound, Sound deathSound, int aggroRange, Attack[] attacks, Ability[] abilities, SpawnCondition spawnCondition, Tameable tameable, Drop[] drops, int minXp, int maxXp) {
 		this.name = name;
 		this.maxHp = maxHp;
 		this.moveSpeed = moveSpeed;
@@ -251,7 +251,7 @@ public class FancyMob {
 		}
 
 		// Register model and set scale
-		tracker = BetterModel.model(modelName).map(r -> r.getOrCreate(entity)).orElse(null);
+		tracker = BetterModel.model(modelName[(int)(Math.random()*modelName.length)]).map(r -> r.getOrCreate(entity)).orElse(null);
 		if (tracker != null) {
 			tracker.scaler(ModelScaler.value(scale));
 
@@ -326,7 +326,7 @@ public class FancyMob {
 					double health = entity.getHealth();
 					entity.remove();
 					entity = null;
-					modelName = tameable.saddleModel;
+					modelName = new String[] {tameable.saddleModel};
 					player.getEquipment().getItemInMainHand().setAmount(player.getEquipment().getItemInMainHand().getAmount()-1);
 					
 					Bukkit.getScheduler().runTaskLater(FancyMobs.plugin, () -> {

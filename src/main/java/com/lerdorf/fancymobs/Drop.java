@@ -2,14 +2,26 @@ package com.lerdorf.fancymobs;
 
 import java.util.Collection;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Container;
+import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
+import org.bukkit.entity.Pig;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
+import org.bukkit.loot.Lootable;
 
 public class Drop {
 	public ItemStack item;
@@ -25,23 +37,46 @@ public class Drop {
 	}
 	
 	public static ItemStack getFromLoot(String loot) {
-		NamespacedKey key = NamespacedKey.fromString(loot);
-		LootTable table = Bukkit.getLootTable(key);
-		if (table != null) {
-		    // You just need a world & location for the context
-		    World world = Bukkit.getWorlds().getFirst(); // or any valid world
-		    LootContext context = new LootContext.Builder(new Location(world, 0, 0, 0))
-		        .build();
+		World world = Bukkit.getWorlds().get(0);
+		Location loc = world.getSpawnLocation().clone();
+		loc.setY(world.getMaxHeight() - 2);
 
-		    Collection<ItemStack> items = table.populateLoot(new Random(), context);
+		// Place a temporary barrel
+		Block block = loc.getBlock();
+		block.setType(Material.BARREL);
 
-		    ItemStack first = items.stream().findFirst().orElse(null);
-		    if (first != null) {
-		        return first;
+		// Get a console sender (or your plugin command sender)
+		ConsoleCommandSender sender = Bukkit.getConsoleSender();
+
+		// Build the loot command
+		String lootTable = loot; // your loot table
+		String cmd = "loot insert " + block.getX() + " " + block.getY() + " " + block.getZ() + " loot " 
+		             + lootTable;
+
+		// Dispatch the command
+		Bukkit.dispatchCommand(sender, cmd);
+
+		// Access the inventory immediately
+		if (block.getState() instanceof Container container) {
+		    Inventory inv = container.getInventory();
+		    ItemStack firstItem = null;
+		    for (ItemStack item : inv.getContents()) {
+		        if (item != null && item.getType() != Material.AIR) {
+		            firstItem = item.clone();
+		            break;
+		        }
 		    }
+
+		    // Schedule cleanup
+		    Bukkit.getScheduler().runTaskLater(FancyMobs.plugin, () -> block.setType(Material.AIR), 5L);
+
+		    return firstItem;
 		}
+
 		return null;
 	}
+
+
 	
 	public Drop(String loot, float probability, int minCount, int maxCount) {
 		this.probability = probability;
