@@ -343,8 +343,6 @@ public class FancyMob {
 	}
 
 	public int getDroppedExp() {
-		// TODO Auto-generated method stub
-		
 		return (int)(Math.random()*(maxXp-minXp)+minXp);
 	}
 }
