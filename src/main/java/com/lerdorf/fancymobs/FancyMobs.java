@@ -174,7 +174,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 			meta.setItemModel(NamespacedKey.fromString("dinosaur_helmet"));
 			meta.setDisplayName(ChatColor.GREEN + "Dinosaur Helmet");
 			
-			meta.addAttributeModifier(Attribute.ARMOR, new AttributeModifier(new NamespacedKey(this, "dinosaur_helmet_armor"), 2.0, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD));
+			meta.addAttributeModifier(Attribute.ARMOR, new AttributeModifier(new NamespacedKey(plugin, "dinosaur_helmet_armor"), 2.0, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD));
 			meta.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, new AttributeModifier(new NamespacedKey(plugin, "dinosaur_helmet_toughness"), 2.0, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD));
 			meta.addAttributeModifier(Attribute.MOVEMENT_EFFICIENCY, new AttributeModifier(new NamespacedKey(plugin, "dinosaur_helmet_efficiency"), 0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD));
 			

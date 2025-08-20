@@ -29,7 +29,7 @@ public class Drop {
 		LootTable table = Bukkit.getLootTable(key);
 		if (table != null) {
 		    // You just need a world & location for the context
-		    World world = Bukkit.getWorld("world"); // or any valid world
+		    World world = Bukkit.getWorlds().getFirst(); // or any valid world
 		    LootContext context = new LootContext.Builder(new Location(world, 0, 0, 0))
 		        .build();
 
