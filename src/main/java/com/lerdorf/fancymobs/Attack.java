@@ -57,7 +57,7 @@ public class Attack {
 					target.setFireTicks(target.getFireTicks() + (int)power);
 					break;
 				case KNOCKUP:
-					target.setVelocity(target.getVelocity().add( new Vector(0, power, 0) ));
+					target.setVelocity(target.getVelocity().setY(power));
 					break;
 				case SLOWNESS:
 					target.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, (int)(power*10+4)*20, (int)power));

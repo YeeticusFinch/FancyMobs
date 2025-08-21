@@ -44,6 +44,9 @@ public class Ability {
 	public static final int SLEEP = 4;
 	public static final int ROAR = 5;
 	public static final int SHAKE = 6;
+	public static final int FLY = 7;
+	public static final int GLIDE = 8;
+	public static final int DIVE = 9;
 
 	int id;
 	String anim;
@@ -64,9 +67,9 @@ public class Ability {
 		this.sound = sound;
 	}
 
-	public void act(FancyMob mob, LivingEntity target, boolean force) {
+	public boolean act(FancyMob mob, LivingEntity target, boolean force) {
 		if (System.currentTimeMillis() - lastShot < cooldown)
-			return;
+			return false;
 		lastShot = System.currentTimeMillis();
 		double distance = -1;
 		if (mob.entity != null && mob.entity.isValid() && target != null && target.isValid()) {
@@ -86,7 +89,7 @@ public class Ability {
 		}
 		switch (id) {
 		case RED_LASER: {
-			if (force || distance > 5 && distance < 60) {
+			if (force || (distance > 5 && distance < 60 && !mob.flying)) {
 				mob.entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 2*20, 10, true,  false));
 				mob.tracker.animate(anim);
 				Bukkit.getScheduler().runTaskLater(FancyMobs.plugin, () -> {
@@ -100,11 +103,12 @@ public class Ability {
 						mob.tracker.stopAnimation(anim);
 					}, 5);
 				}, 5);
+				return true;
 			}
 			break;
 		}
 		case THROW_SICKLE: {
-			if (force || distance > 3 && distance < 30) {
+			if (force || (distance > 3 && distance < 30 && !mob.flying)) {
 				mob.entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 2*20, 10, true,  false));
 				mob.tracker.animate(anim);
 				Bukkit.getScheduler().runTaskLater(FancyMobs.plugin, () -> {
@@ -122,11 +126,12 @@ public class Ability {
 						mob.tracker.stopAnimation(anim);
 					}, 5);
 				}, 9);
+				return true;
 			}
 			break;
 		}
 		case SIT: {
-			if (force || target == null || !target.isValid()) {
+			if (force || ((target == null || !target.isValid()) && !mob.flying)) {
 				if (!mob.entity.getScoreboardTags().contains("sitting")) {
 					Collection<PotionEffect> newEffects = new ArrayList<>();
 					newEffects.add(new PotionEffect(PotionEffectType.SLOWNESS, 20*20, 255, true, false));
@@ -140,18 +145,20 @@ public class Ability {
 							mob.tracker.stopAnimation(anim);
 						}
 					}, 20*20);
+					return true;
 				}
 			} else {
 				if (mob.entity.getScoreboardTags().contains("sitting")) {
 					mob.entity.removePotionEffect(PotionEffectType.SLOWNESS);
 					mob.entity.removeScoreboardTag("sitting");
 					mob.tracker.stopAnimation(anim);
+					return true;
 				}
 			}
 			break;
 		}
 		case SPRINT: {
-			if (force || distance > 3 && distance < 30 && !mob.entity.getScoreboardTags().contains("sprinting")) {
+			if (force || (distance > 3 && distance < 30 && !mob.entity.getScoreboardTags().contains("sprinting") && !mob.flying)) {
 				Collection<PotionEffect> newEffects = new ArrayList<>();
 				newEffects.add(new PotionEffect(PotionEffectType.SPEED, 20*20, 3, true, false));
 				mob.entity.addPotionEffects(newEffects);
@@ -169,13 +176,15 @@ public class Ability {
 				
 				mob.entity.addScoreboardTag("sprinting");
 				Bukkit.getScheduler().runTaskLater(FancyMobs.plugin, () -> {
+					mob.entity.removeScoreboardTag("sprinting");
 					mob.tracker.stopAnimation(anim);
 				}, 20*20);
+				return true;
 			}
 			break;
 		}
 		case SHAKE: {
-			if (force && !mob.entity.getScoreboardTags().contains("shaking")) {
+			if (force || (target == null && !mob.entity.getScoreboardTags().contains("shaking") && !mob.flying)) {
 				Location loc = mob.entity.getLocation();
 				mob.tracker.animate(anim);
 				Collection<PotionEffect> newEffects = new ArrayList<>();
@@ -187,11 +196,12 @@ public class Ability {
 					mob.tracker.stopAnimation(anim);
 					mob.entity.removeScoreboardTag("shaking");
 				}, 20*2);
+				return true;
 			}
 			break;
 		}
 		case ROAR: {
-			if (force && !mob.entity.getScoreboardTags().contains("roaring")) {
+			if (force || (!mob.entity.getScoreboardTags().contains("roaring") && !mob.flying)) {
 				Location loc = mob.entity.getLocation();
 				mob.tracker.animate(anim);
 				Collection<PotionEffect> newEffects = new ArrayList<>();
@@ -203,10 +213,97 @@ public class Ability {
 					mob.tracker.stopAnimation(anim);
 					mob.entity.removeScoreboardTag("roaring");
 				}, 20*3);
+				return true;
+			}
+			break;
+		}
+		case FLY: {
+			if (force || !mob.entity.getScoreboardTags().contains("flying")) {
+				Collection<PotionEffect> newEffects = new ArrayList<>();
+				newEffects.add(new PotionEffect(PotionEffectType.SLOW_FALLING, 20*90, 3, true, false));
+				mob.entity.addPotionEffects(newEffects);
+				
+				//mob.entity.setGravity(false);
+				
+				 var walkSupplier = FunctionUtil.throttleTickBoolean(() -> true);
+			        var walkSpeedSupplier = FloatConstantSupplier.ONE;
+			        mob.tracker.animate(anim, new AnimationModifier(walkSupplier, 6, 0, AnimationIterator.Type.LOOP, walkSpeedSupplier));
+				//mob.tracker.animate(anim);
+				mob.flyAnim = anim;
+				mob.entity.addScoreboardTag("flying");
+				mob.flying = true;
+				Bukkit.getScheduler().runTaskLater(FancyMobs.plugin, () -> {
+					mob.entity.removeScoreboardTag("flying");
+					mob.tracker.stopAnimation(anim);
+					//mob.entity.setGravity(true);
+					mob.flying = false;
+					mob.entity.removePotionEffect(PotionEffectType.SLOW_FALLING);
+					if (mob.gliding) {
+						mob.gliding = false;
+						mob.tracker.stopAnimation(mob.glideAnim);
+						mob.entity.removeScoreboardTag("gliding");
+					}
+					if (mob.diving) {
+						mob.diving = false;
+						mob.tracker.stopAnimation(mob.diveAnim);
+						mob.entity.removeScoreboardTag("diving");
+					}
+				}, (int)(20*(30+Math.random()*60)));
+				return true;
+			}
+			break;
+		}
+		case GLIDE: {
+			if (force || (!mob.entity.getScoreboardTags().contains("gliding") && mob.entity.getScoreboardTags().contains("flying"))) {
+				//Collection<PotionEffect> newEffects = new ArrayList<>();
+				//newEffects.add(new PotionEffect(PotionEffectType.SPEED, 20*20, 3, true, false));
+				//mob.entity.addPotionEffects(newEffects);
+				
+				//mob.entity.setGravity(false);
+				
+				var walkSupplier = FunctionUtil.throttleTickBoolean(() -> true);
+		        var walkSpeedSupplier = FloatConstantSupplier.ONE;
+		        mob.tracker.animate(anim, new AnimationModifier(walkSupplier, 6, 0, AnimationIterator.Type.LOOP, walkSpeedSupplier));
+				//mob.tracker.animate(anim);
+				mob.glideAnim = anim;
+				mob.entity.addScoreboardTag("gliding");
+				mob.gliding = true;
+				Bukkit.getScheduler().runTaskLater(FancyMobs.plugin, () -> {
+					mob.entity.removeScoreboardTag("gliding");
+					mob.tracker.stopAnimation(anim);
+					mob.gliding = false;
+				}, (int)(20*(Math.random()*60)));
+				return true;
+			}
+			break;
+		}
+		case DIVE:
+		{
+			if (force || (target != null && !mob.entity.getScoreboardTags().contains("diving") && mob.entity.getScoreboardTags().contains("flying"))) {
+				//Collection<PotionEffect> newEffects = new ArrayList<>();
+				//newEffects.add(new PotionEffect(PotionEffectType.SPEED, 20*20, 3, true, false));
+				//mob.entity.addPotionEffects(newEffects);
+				
+				//mob.entity.setGravity(false);
+				
+				var walkSupplier = FunctionUtil.throttleTickBoolean(() -> true);
+		        var walkSpeedSupplier = FloatConstantSupplier.ONE;
+		        mob.tracker.animate(anim, new AnimationModifier(walkSupplier, 6, 0, AnimationIterator.Type.LOOP, walkSpeedSupplier));
+				//mob.tracker.animate(anim);
+				mob.diveAnim = anim;
+				mob.entity.addScoreboardTag("diving");
+				mob.diving = true;
+				Bukkit.getScheduler().runTaskLater(FancyMobs.plugin, () -> {
+					mob.entity.removeScoreboardTag("diving");
+					mob.tracker.stopAnimation(anim);
+					mob.diving = false;
+				}, (int)(20*(10)));
+				return true;
 			}
 			break;
 		}
 		}
+		return false;
 	}
 
 	boolean hitBlock(FancyMob mob, Location loc) {

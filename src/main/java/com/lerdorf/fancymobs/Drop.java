@@ -90,12 +90,13 @@ public class Drop {
 	
 	public ItemStack getDrop(int looting) {
 		int amount = minCount;
-		for (int i = minCount; i <= (maxCount > 1 ? maxCount + looting : maxCount); i++) {
+		for (int i = minCount; i <= (maxCount > 1 ? (maxCount + looting) : maxCount); i++) {
 			if (Math.random() > probability + 0.01f*looting) {
 				amount = i;
 				break;
 			}
 		}
+		//Bukkit.broadcastMessage("Min = " + minCount + ", Max = " + maxCount + ", Probability = " + probability + ", Rolled = " + amount);
 		if (amount == 0) return null;
 		else {
 			ItemStack result = item.clone();

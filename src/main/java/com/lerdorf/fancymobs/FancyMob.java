@@ -15,6 +15,7 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -27,6 +28,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import kr.toxicity.model.api.BetterModel;
@@ -128,10 +130,11 @@ public class FancyMob {
 				return;
 			} 
 			lastAttack = System.currentTimeMillis();
-			tracker.animate(attack.anim);
+			if (!flying)
+				tracker.animate(attack.anim);
 			if (Math.abs(attack.damage+1) > 0.1)
 				event.setDamage(attack.damage);
-		} else
+		} else if (!flying)
 			tracker.animate("attack");
 	}
 	
@@ -162,13 +165,129 @@ public class FancyMob {
 		return "passive";
 	}
 	
+	Entity target = null;
+	Location targetLoc = null;
 	
+	public boolean flying = false;
+	public boolean gliding = false;
+	public boolean diving = false;
+	
+	public String flyAnim = null;
+	public String glideAnim = null;
+	public String diveAnim = null;
 	
 	long lastAmbient = 0;
 	
+	public static void particleLine(FancyParticle particle, Location l1, Location l2, float step) {
+		double dist = l1.distance(l2);
+		int steps = (int)Math.round(dist/step);
+		Vector dir = l1.clone().subtract(l2).toVector().normalize().multiply(step);
+		for (int i = 0; i < steps; i++) {
+			particle.spawn(l1.clone().add(dir));
+		}
+	}
+	
+	public void tick_2() {
+		if (entity != null && entity.isValid()) {
+			//Bukkit.broadcastMessage("2 tick");
+			if (flying) {
+				Location loc = entity.getLocation();
+				loc.setDirection(entity.getVelocity());
+				entity.setRotation(loc.getYaw(), loc.getPitch());
+				if (targetLoc != null) {
+					Vector vel = entity.getVelocity();
+					Vector targetVel = targetLoc.clone().subtract(entity.getLocation()).toVector();
+					Vector diff = targetVel.subtract(vel).normalize().multiply(0.1);
+					
+					if (diving) {
+						if (target != null) {
+							targetLoc = target.getLocation().add(new Vector(0, target.getHeight()/2, 0));
+							targetVel = targetLoc.clone().subtract(entity.getLocation()).toVector();
+							diff = targetVel.subtract(vel).normalize().multiply(0.9);
+						}
+						double magnitude = vel.length();
+						if (diff.clone().normalize().getY() < -0.3) {
+							magnitude *= 1.3f;
+						}
+						entity.setVelocity(vel.add(diff).normalize().multiply(magnitude));
+						if (diff.clone().normalize().getY() > 0) {
+							entity.removeScoreboardTag("diving");
+							tracker.stopAnimation(diveAnim);
+							diving = false;
+							targetLoc = entity.getLocation().add(Math.random()*20-10, 20, Math.random()*20-10);
+						}
+						if (entity.getLocation().distanceSquared(targetLoc) < 10) {
+							entity.removeScoreboardTag("diving");
+							tracker.stopAnimation(diveAnim);
+							diving = false;
+							entity.attack(target);
+						}
+					}
+					if (gliding) {
+						diff.setY(0);
+						double magnitude = vel.length()*0.95;
+						vel.setY(-0.02);
+						entity.setVelocity(vel.add(diff).normalize().multiply(magnitude));
+					}
+					
+					entity.setVelocity(vel.add(diff).normalize().multiply(flySpeed));
+					
+					if (loc.distanceSquared(targetLoc) < 10)
+						targetLoc = null;
+				} else {
+					if (target == null) {
+						targetLoc = entity.getLocation().add(Vector.getRandom().multiply(Math.random()*50-25));
+						targetLoc.setY(entity.getY());
+						Location ground = raycastForBlocksAndFluids(entity.getLocation().add(0, 10, 0), new Vector(0, -30, 0));
+						targetLoc.setY(ground.getY() + 20 + 10 * Math.random());
+					} else {
+						targetLoc = target.getLocation().add(Vector.getRandom().multiply(Math.random()*30-15));
+						Location ground = raycastForBlocksAndFluids(entity.getLocation().add(0, 10, 0), new Vector(0, -30, 0));
+						targetLoc.setY(ground.getY() + 20 + 10 * Math.random());
+					}
+				}
+				//Bukkit.broadcastMessage("flying");
+				//particleLine(new FancyParticle(Particle.HAPPY_VILLAGER, 1, 0, 0, 0, 0), entity.getLocation(), targetLoc, 0.5f);
+			}
+		}
+	}
+	
+	public static Vector getClosestPoint(Vector point, BoundingBox box) {
+		double x = clamp(point.getX(), box.getMinX(), box.getMaxX());
+		double y = clamp(point.getY(), box.getMinY(), box.getMaxY());
+		double z = clamp(point.getZ(), box.getMinZ(), box.getMaxZ());
+		return new Vector(x, y, z);
+	}
+
+	private static double clamp(double val, double min, double max) {
+		return Math.max(min, Math.min(max, val));
+	}
+
+	
+	public Location raycastForBlocksAndFluids(Location loc, Vector target) {
+		Location result = loc.clone();
+
+		double inc = 0.9;
+
+		for (int i = 0; i < target.length() / inc; i++) {
+			Block block = result.getBlock();
+			if (block.isLiquid())
+				return block.getLocation();
+			if (!block.isPassable() && block.getBoundingBox().contains(result.toVector())) {
+				return getClosestPoint(loc.toVector(), block.getBoundingBox()).toLocation(loc.getWorld())
+						.subtract(target.clone().normalize().multiply(0.5f));
+			}
+			result = result.add(target.clone().normalize().multiply(0.9));
+		}
+
+		result.add(target.clone().normalize().multiply(target.length() - inc * ((int) (target.length() / inc))));
+
+		return result;
+	}
+	
 	public void tick_10() {
 		if (entity != null && entity.isValid()) {
-			Entity target = null;
+			target = null;
 			try {
 				//entity.getTargetEntity(aggroRange, true);
 				if (entity instanceof Mob mob) {
@@ -178,6 +297,7 @@ public class FancyMob {
 				
 			}
 			if (target != null && target.isValid()) {
+				//targetLoc = target.getLocation();
 				Vector dir = target.getLocation().toVector().subtract(entity.getLocation().toVector());
 				if (dir.dot(new Vector(0, 1, 0)) > 0.6 && Math.random() < 0.15) {
 					entity.setJumping(true);
@@ -191,11 +311,21 @@ public class FancyMob {
 					}
 				}
 			}
+			if (flying) {
+				entity.getWorld().playSound(entity.getLocation(), org.bukkit.Sound.ENTITY_PHANTOM_FLAP, 1, 1);
+			}
 			if (Math.random() < 0.1 && abilities != null && abilities.length > 0) {
-				try {
-					abilities[(int)(Math.random()*abilities.length)].act(this, (LivingEntity)target, false);
-				} catch (Exception e) {
-					System.out.println(e.getLocalizedMessage());
+				boolean success = false;
+				int tries = 0;
+				while (!success && tries < 4) {
+					try {
+						tries++;
+						success = abilities[(int)(Math.random()*abilities.length)].act(this, target != null ? (LivingEntity)target : null, false);
+					} catch (Exception e) {
+						System.out.println(e.getLocalizedMessage());
+					}
+					if (tries >= 4)
+						break;
 				}
 			}
 			
@@ -206,6 +336,8 @@ public class FancyMob {
 			}
 		}
 	}
+	
+	double flySpeed = 0.1f;
 	
 	public void spawn(Location loc) {
 		entity = (LivingEntity) loc.getWorld().spawnEntity(loc, baseType);
@@ -221,6 +353,8 @@ public class FancyMob {
 		entity.setHealth(maxHp);
 		
 		entity.getAttribute(Attribute.FOLLOW_RANGE).setBaseValue(aggroRange);
+		entity.setCanPickupItems(false);
+		entity.getEquipment().clear();
 
 		// Set Movement Speed (if applicable to this entity)
 		AttributeInstance speedAttr = entity.getAttribute(Attribute.MOVEMENT_SPEED);
@@ -230,6 +364,9 @@ public class FancyMob {
 		
 		if (attributes != null && attributes.size() > 0) {
 			for (Attribute attr : attributes.keySet()) {
+				if (attr.equals(Attribute.FLYING_SPEED)) {
+					flySpeed = attributes.get(attr);
+				}
 				if (entity.getAttribute(attr) != null)
 					entity.getAttribute(attr).setBaseValue(attributes.get(attr));
 			}
@@ -270,6 +407,14 @@ public class FancyMob {
 			    // Recreate damage hitboxes only on bones that qualify
 			    BonePredicate pred = BonePredicate.of(BonePredicate.State.TRUE, bone -> isDamageHitboxBone(bone));
 			    tracker.createHitBox(pred, damageListener);
+		}
+		
+		FancyMobs.fancyMobs.put(entity.getUniqueId(), this);
+		
+		for (Ability a : abilities) {
+			if (a.id == Ability.FLY && Math.random() < 0.5) {
+				a.act(this, null, true);
+			}
 		}
 	}
 	
