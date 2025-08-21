@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.nio.file.Files;
@@ -55,6 +56,8 @@ import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -792,7 +795,36 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 			e.printStackTrace();
 		}
 	}
+	
+	private File dataFile;
+    private FileConfiguration dataConfig;
 
+    private void loadDataFile() {
+    	 // Ensure plugin folder exists
+        if (!getDataFolder().exists()) {
+            getDataFolder().mkdirs();
+        }
+
+        // Create/load data.yml
+        dataFile = new File(getDataFolder(), "data.yml");
+        if (!dataFile.exists()) {
+            try {
+                dataFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        dataConfig = YamlConfiguration.loadConfiguration(dataFile);
+
+        // Load warriorFactoryLocs
+        List<String> savedList = dataConfig.getStringList("warriorFactoryLocs");
+        warriorFactoryLocs.clear();
+        warriorFactoryLocs.addAll(savedList);
+
+        getLogger().info("Loaded " + warriorFactoryLocs.size() + " warrior25 factory locations.");
+    }
+    
 	@Override
 	public void onEnable() {
 		plugin = this;
@@ -805,6 +837,8 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 		loadCustomItems();
 		
 		loadSchematic("warrior24_factory.schem");
+		
+		loadDataFile();
 
 		loadMobRegistry();
 
@@ -831,6 +865,13 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 
 	@Override
 	public void onDisable() {
+		dataConfig.set("warriorFactoryLocs", warriorFactoryLocs);
+        try {
+            dataConfig.save(dataFile);
+            getLogger().info("Saved " + warriorFactoryLocs.size() + " warrior25 factory locations.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 		getLogger().info("FancyMobs disabled!");
 	}
 	
@@ -1047,7 +1088,18 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
+		if (args.length > 0 && args[0].equalsIgnoreCase("factory")) {
+			if (warriorFactoryLocs != null && warriorFactoryLocs.size() > 0) {
+				sender.sendMessage(ChatColor.RED + "Warrior25 Factory Locations:");
+				for (String s : warriorFactoryLocs) {
+					sender.sendMessage(ChatColor.YELLOW + " " + s);
+				}
+			} else {
+				sender.sendMessage(ChatColor.RED + "No Warrior25 Factories in this world");
+			}
+			return true;
+		}
+		else if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
 			try {
 				// Copy the files from build to expanded_warfare, zip the new resourcepack and update the sha1 hash
 				ProcessBuilder pb = new ProcessBuilder(resourcepackUpdateScript);
@@ -1064,6 +1116,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 							e.printStackTrace();
 						}
 				}, 60);
+				return true;
 			} catch (Exception e) {
 				sender.sendMessage("Failed to modify resourcepack: " + e.getLocalizedMessage());
 			}
@@ -1161,6 +1214,9 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
         pasteStructure(bukkitWorld, blockX, pasteY, blockZ);
     }
 	
+	public static List<String> warriorFactoryLocs = new ArrayList<>();
+	
+	
 	private void pasteStructure(org.bukkit.World bukkitWorld, int x, int y, int z) {
 	    try {
 	        World adaptedWorld = BukkitAdapter.adapt(bukkitWorld);
@@ -1175,7 +1231,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 	                    .build();
 	            editSession.flushSession();
 	        }
-
+	        warriorFactoryLocs.add(adaptedWorld.getName().toLowerCase() + "," + x + "," + y + "," + z);
 	        getLogger().info("Spawned structure with entities at " + x + ", " + y + ", " + z);
 	    } catch (Exception e) {
 	        e.printStackTrace();
