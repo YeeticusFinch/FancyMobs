@@ -47,6 +47,8 @@ public class Ability {
 	public static final int FLY = 7;
 	public static final int GLIDE = 8;
 	public static final int DIVE = 9;
+	public static final int SURRENDER = 10;
+	public static final int HEAL = 11;
 
 	int id;
 	String anim;
@@ -298,6 +300,61 @@ public class Ability {
 					mob.tracker.stopAnimation(anim);
 					mob.diving = false;
 				}, (int)(20*(10)));
+				return true;
+			}
+			break;
+		}
+
+		case SURRENDER: {
+			if (force || ((target == null || !target.isValid()) && !mob.flying && (mob.entity.getHealth() <= mob.maxHp/3))) {
+				if (!mob.surrendering) {
+					Collection<PotionEffect> newEffects = new ArrayList<>();
+					newEffects.add(new PotionEffect(PotionEffectType.SLOWNESS, 20*20, 255, true, false));
+					newEffects.add(new PotionEffect(PotionEffectType.WEAKNESS, 20*20, 255, true, false));
+					mob.entity.addPotionEffects(newEffects);
+					mob.entity.addScoreboardTag("surrendering");
+					mob.surrendering = true;
+					mob.tracker.animate(anim);
+					Bukkit.getScheduler().runTaskLater(FancyMobs.plugin, () -> {
+						if (mob.surrendering) {
+							if (mob.entity.getHealth() < mob.maxHp) {
+								mob.entity.setHealth(Math.min(mob.entity.getHealth() + 4+Math.random()*10, mob.maxHp));
+							}
+							mob.surrendering = false;
+							mob.entity.removePotionEffect(PotionEffectType.SLOWNESS);
+							mob.entity.removePotionEffect(PotionEffectType.WEAKNESS);
+							mob.entity.removeScoreboardTag("surrendering");
+							mob.tracker.stopAnimation(anim);
+						}
+					}, 20*20);
+					return true;
+				}
+			} else {
+				if (mob.entity.getScoreboardTags().contains("surrendering")) {
+					mob.entity.removePotionEffect(PotionEffectType.SLOWNESS);
+					mob.entity.removeScoreboardTag("surrendering");
+					mob.tracker.stopAnimation(anim);
+					return true;
+				}
+			}
+			break;
+		}
+		
+		case HEAL: {
+			if (force || (target == null && !mob.entity.getScoreboardTags().contains("healing") && !mob.flying && mob.entity.getHealth() < mob.maxHp)) {
+				Location loc = mob.entity.getLocation();
+				mob.tracker.animate(anim);
+				Collection<PotionEffect> newEffects = new ArrayList<>();
+				newEffects.add(new PotionEffect(PotionEffectType.SLOWNESS, 20*2, 5, true, false));
+				mob.entity.heal(2 + Math.random()*6);
+				mob.entity.addPotionEffects(newEffects);
+				if (sound != null)
+					Util.playSound(sound, loc);
+				mob.entity.addScoreboardTag("healing");
+				Bukkit.getScheduler().runTaskLater(FancyMobs.plugin, () -> {
+					mob.tracker.stopAnimation(anim);
+					mob.entity.removeScoreboardTag("healing");
+				}, 20*2);
 				return true;
 			}
 			break;

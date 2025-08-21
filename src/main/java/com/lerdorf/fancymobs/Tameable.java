@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 public class Tameable {
 
 	public Material[] tameMaterial = null;
+	public ItemStack[] tameItems = null;
 	public ItemStack saddleItem;
 	public boolean saddleable;
 	public boolean tamed = false;
@@ -28,6 +29,13 @@ public class Tameable {
 		this.saddleItem = saddleItem;
 		this.saddleable = saddleable;
 		this.tameChance = tameChance;
+		this.saddleModel = saddleModel;
+	}
+
+	public Tameable(ItemStack[] tameItems, ItemStack saddleItem, boolean saddleable, String saddleModel) {
+		this.tameItems = tameItems;
+		this.saddleItem = saddleItem;
+		this.saddleable = saddleable;
 		this.saddleModel = saddleModel;
 	}
 
@@ -65,9 +73,18 @@ public class Tameable {
 	
 	boolean isTameMaterial(ItemStack item) {
 
-		for (Material mat : tameMaterial) {
-			if (mat == item.getType()) {
-				return true;
+		if (tameMaterial != null && tameMaterial.length > 0) {
+			for (Material mat : tameMaterial) {
+				if (mat == item.getType()) {
+					return true;
+				}
+			}
+		}
+		if (tameItems != null && tameItems.length > 0) {
+			for (ItemStack match : tameItems) {
+				if (match.getType() == item.getType() && (match.hasItemMeta() == item.hasItemMeta() && (match.hasItemMeta() == false || (match.getItemMeta().getItemModel().asMinimalString().equalsIgnoreCase(item.getItemMeta().getItemModel().asMinimalString()))))) {
+					return true;
+				}
 			}
 		}
 		return false;

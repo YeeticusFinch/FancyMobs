@@ -134,6 +134,8 @@ public class FancyMob {
 				tracker.animate(attack.anim);
 			if (Math.abs(attack.damage+1) > 0.1)
 				event.setDamage(attack.damage);
+			if (event.getEntity() instanceof LivingEntity le)
+			attack.attack(entity, le);
 		} else if (!flying)
 			tracker.animate("attack");
 	}
@@ -171,6 +173,8 @@ public class FancyMob {
 	public boolean flying = false;
 	public boolean gliding = false;
 	public boolean diving = false;
+	
+	public boolean surrendering = false;
 	
 	public String flyAnim = null;
 	public String glideAnim = null;
@@ -287,6 +291,14 @@ public class FancyMob {
 	
 	public void tick_10() {
 		if (entity != null && entity.isValid()) {
+			if (entity.getHealth() <= maxHp/3 && !surrendering) {
+				for (Ability a : abilities) {
+					if (a.id == Ability.SURRENDER) {
+						a.act(this, null, true);
+						break;
+					}
+				}
+			}
 			target = null;
 			try {
 				//entity.getTargetEntity(aggroRange, true);
@@ -296,7 +308,7 @@ public class FancyMob {
 			} catch (Exception e) {
 				
 			}
-			if (target != null && target.isValid()) {
+			if (target != null && target.isValid() && !surrendering) {
 				//targetLoc = target.getLocation();
 				Vector dir = target.getLocation().toVector().subtract(entity.getLocation().toVector());
 				if (dir.dot(new Vector(0, 1, 0)) > 0.6 && Math.random() < 0.15) {
@@ -308,6 +320,7 @@ public class FancyMob {
 						lastAttack = System.currentTimeMillis();
 						tracker.animate(attack.anim);
 						le.damage(attack.damage, entity);
+						attack.attack(entity, le);
 					}
 				}
 			}
@@ -455,18 +468,23 @@ public class FancyMob {
 		
 		if (tameable != null) {
 			if (!tameable.tamed) {
+				if (alignment == HOSTILE && !surrendering) {
+					return;
+				}
 				switch (tameable.tryTame(player)) {
-				case -1: // Wrong item
-					break;
-				case 0: // Right item, unsuccessful
-					event.getRightClicked().getWorld().spawnParticle(Particle.SMOKE, event.getRightClicked().getLocation(), 20, 0.4f, 0.4f, 0.4f, 0.1f);
-					break;
-				case 1: // Tamed!
-					event.getRightClicked().getWorld().spawnParticle(Particle.HEART, event.getRightClicked().getLocation(), 20, 0.4f, 0.4f, 0.4f, 0.1f);
-					break;
+					case -1: // Wrong item
+						break;
+					case 0: // Right item, unsuccessful
+						event.getRightClicked().getWorld().spawnParticle(Particle.SMOKE, event.getRightClicked().getLocation(), 20, 0.4f, 0.4f, 0.4f, 0.1f);
+						break;
+					case 1: // Tamed!
+						event.getRightClicked().getWorld().spawnParticle(Particle.HEART, event.getRightClicked().getLocation(), 20, 0.4f, 0.4f, 0.4f, 0.1f);
+						break;
 				}
 			} else if (tameable.saddleable && !tameable.saddled) {
 				if (tameable.isCorrectSaddle(player.getEquipment().getItemInMainHand())) {
+					if (alignment == HOSTILE)
+						alignment = NEUTRAL;
 					Location loc = entity.getLocation();
 					double health = entity.getHealth();
 					entity.remove();
