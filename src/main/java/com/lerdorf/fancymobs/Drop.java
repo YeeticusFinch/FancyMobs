@@ -67,6 +67,8 @@ public class Drop {
 		        }
 		    }
 
+		    container.getInventory().clear();
+		    
 		    // Schedule cleanup
 		    Bukkit.getScheduler().runTaskLater(FancyMobs.plugin, () -> block.setType(Material.AIR), 5L);
 

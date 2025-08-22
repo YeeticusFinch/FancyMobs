@@ -126,7 +126,7 @@ public class FancyMob {
 		if (attacks != null && attacks.length > 0) {
 			Attack attack = attacks[(int)(Math.random()*attacks.length)];
 			if (System.currentTimeMillis() - lastAttack < attack.cooldown) {
-				event.setCancelled(true);
+				//event.setCancelled(true);
 				return;
 			} 
 			lastAttack = System.currentTimeMillis();
@@ -134,8 +134,11 @@ public class FancyMob {
 				tracker.animate(attack.anim);
 			if (Math.abs(attack.damage+1) > 0.1)
 				event.setDamage(attack.damage);
-			if (event.getEntity() instanceof LivingEntity le)
-			attack.attack(entity, le);
+			if (event.getEntity() instanceof LivingEntity le) {
+				attack.attack(entity, le);
+				//if (Math.abs(attack.damage+1) > 0.1)
+				//	le.damage(attack.damage, entity);
+			}
 		} else if (!flying)
 			tracker.animate("attack");
 	}
@@ -289,8 +292,21 @@ public class FancyMob {
 		return result;
 	}
 	
+	public LivingEntity lastDamageEntity = null;
+	public long damageTime = 0;
+	
 	public void tick_10() {
 		if (entity != null && entity.isValid()) {
+			boolean nearbyPlayer = false;
+			for (Player p : entity.getWorld().getPlayers()) {
+				if (p.getLocation().distanceSquared(entity.getLocation()) < 6500) {
+					nearbyPlayer = true;
+					break;
+				}
+			}
+			if (!nearbyPlayer)
+				return;
+			
 			if (entity.getHealth() <= maxHp/3 && !surrendering) {
 				for (Ability a : abilities) {
 					if (a.id == Ability.SURRENDER) {
@@ -308,6 +324,9 @@ public class FancyMob {
 			} catch (Exception e) {
 				
 			}
+			if (target == null && lastDamageEntity != null && System.currentTimeMillis()-8000 < damageTime) {
+				target = lastDamageEntity;
+			}
 			if (target != null && target.isValid() && !surrendering) {
 				//targetLoc = target.getLocation();
 				Vector dir = target.getLocation().toVector().subtract(entity.getLocation().toVector());
@@ -321,6 +340,8 @@ public class FancyMob {
 						tracker.animate(attack.anim);
 						le.damage(attack.damage, entity);
 						attack.attack(entity, le);
+						Location rotLoc = entity.getLocation().setDirection(le.getLocation().subtract(entity.getLocation()).toVector());
+						entity.setRotation(rotLoc.getPitch(), rotLoc.getYaw());
 					}
 				}
 			}

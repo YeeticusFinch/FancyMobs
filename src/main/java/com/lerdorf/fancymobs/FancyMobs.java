@@ -446,7 +446,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				}, 0, 2
 				));
 		
-		mobRegistry.put("allosaurus", new FancyMob("Allosaurus", 86, 0.3f, 0.8f, new String[] {"allosaurus"}, EntityType.POLAR_BEAR,
+		mobRegistry.put("allosaurus", new FancyMob("Allosaurus", 86, 0.3f, 1.8f, new String[] {"allosaurus"}, EntityType.POLAR_BEAR,
 				FancyMob.HOSTILE, new HashMap<>() {
 					{
 						put(Attribute.ARMOR, 14d);
@@ -462,15 +462,15 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				Sound.sound(Key.key("yeet:allo_death"), Source.NEUTRAL, 1.0f, 1.0f),
 				40,
 				new Attack[] { 
-						new Attack("attack", 11, new HashMap<>() {
+						new Attack("attack", 13, new HashMap<>() {
 							{
 								put(Attack.SLOWNESS, 2d);
 							}
 						}, 5, 600
 					),
-						new Attack("run_attack", 9, new HashMap<>() {
+						new Attack("run_attack", 10, new HashMap<>() {
 							{
-								put(Attack.KNOCKBACK, 2d);
+								put(Attack.KNOCKBACK, 1.5d);
 							}
 						}, 5, 600
 					)
@@ -488,6 +488,50 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				new Tameable(new ItemStack[] {rawDinosaurMeat, cookedDinosaurMeat}, new ItemStack(Material.SADDLE), true, "allosaurus_saddle"),
 				new Drop[] {
 						new Drop(rawDinosaurMeat, 0.3f, 0, 2)
+				}, 0, 2
+				));
+		
+		mobRegistry.put("shunosaurus", new FancyMob("Shunosaurus", 75, 0.2f, 1.5f, new String[] {"shunosaurus", "shunosaurus_2", "shunosaurus_3", "shunosaurus_4"}, EntityType.COW,
+				FancyMob.PEACEFUL, new HashMap<>() {
+					{
+						put(Attribute.ARMOR, 5d);
+						//put(Attribute.WATER_MOVEMENT_EFFICIENCY, 0.5);
+					}
+				},
+				new PotionEffect[] {
+						//new PotionEffect(PotionEffectType.WATER_BREATHING, Integer.MAX_VALUE, 3, true, false)
+					},
+				Sound.sound(Key.key("yeet:stego_idle"), Source.NEUTRAL, 1.0f, 0.6f),
+				Sound.sound(Key.key("yeet:stego_hurt"), Source.NEUTRAL, 1.0f, 0.6f),
+				Sound.sound(Key.key("yeet:stego_angry"), Source.NEUTRAL, 1.0f, 0.6f),
+				70,
+				new Attack[] { 
+						new Attack("neck attack", 6, new HashMap<>() {
+								{
+									put(Attack.KNOCKUP, 2d);
+									put(Attack.KNOCKBACK, 2d);
+								}
+							}, 6, 900
+						),
+						new Attack("tail sweep", 11, new HashMap<>() {
+							{
+								put(Attack.KNOCKBACK, 2d);
+							}
+						}, 6, 900
+					)
+				},
+				new Ability[] {
+						new Ability(Ability.SHAKE, "stretch", 4000),
+						new Ability(Ability.SHAKE, "stand", 4000),
+						new Ability(Ability.SPRINT, "run", 4000),
+						new Ability(Ability.STOMP, "stomp", 8000),
+						new Ability(Ability.SIT, "sit", 20000)
+				},
+				new SpawnCondition(new int[] {SpawnCondition.onGround, SpawnCondition.specificFloorTypes, SpawnCondition.specificDimensions}, null, new Material[] {Material.GRASS_BLOCK, Material.DIRT, Material.COARSE_DIRT}, new Environment[] {Environment.NORMAL}),
+				null,
+				new Drop[] {
+						new Drop(dinosaurCarapace, 0.1f, 0, 1),
+						new Drop(rawDinosaurMeat, 0.1f, 1, 2)
 				}, 0, 2
 				));
 
@@ -1074,8 +1118,14 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 					//	mob.death();
 				} else {
 					FancyMob mob = getFancyMob(le);
-					if (mob != null)
+					if (mob != null) {
 						mob.hurt();
+						if (event.getDamageSource().getCausingEntity() != null && event.getDamageSource().getCausingEntity() instanceof LivingEntity lf)
+						{
+							mob.lastDamageEntity = lf;
+							mob.damageTime = System.currentTimeMillis();
+						}
+					}
 				}
 			}
 		} catch (Exception ex) {

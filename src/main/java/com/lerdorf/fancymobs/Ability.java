@@ -49,6 +49,7 @@ public class Ability {
 	public static final int DIVE = 9;
 	public static final int SURRENDER = 10;
 	public static final int HEAL = 11;
+	public static final int STOMP = 12;
 
 	int id;
 	String anim;
@@ -306,7 +307,7 @@ public class Ability {
 		}
 
 		case SURRENDER: {
-			if (force || ((target == null || !target.isValid()) && !mob.flying && (mob.entity.getHealth() <= mob.maxHp/3))) {
+			if (force || (!mob.flying && (mob.entity.getHealth() <= mob.maxHp/3))) {
 				if (!mob.surrendering) {
 					Collection<PotionEffect> newEffects = new ArrayList<>();
 					newEffects.add(new PotionEffect(PotionEffectType.SLOWNESS, 20*20, 255, true, false));
@@ -341,20 +342,65 @@ public class Ability {
 		}
 		
 		case HEAL: {
-			if (force || (target == null && !mob.entity.getScoreboardTags().contains("healing") && !mob.flying && mob.entity.getHealth() < mob.maxHp)) {
+			if (force || (!mob.entity.getScoreboardTags().contains("healing") && !mob.flying && mob.entity.getHealth() < mob.maxHp)) {
 				Location loc = mob.entity.getLocation();
 				mob.tracker.animate(anim);
 				Collection<PotionEffect> newEffects = new ArrayList<>();
 				newEffects.add(new PotionEffect(PotionEffectType.SLOWNESS, 20*2, 5, true, false));
-				mob.entity.heal(2 + Math.random()*6);
+				mob.entity.heal(4+Math.random()*10);
 				mob.entity.addPotionEffects(newEffects);
 				if (sound != null)
 					Util.playSound(sound, loc);
 				mob.entity.addScoreboardTag("healing");
+				
 				Bukkit.getScheduler().runTaskLater(FancyMobs.plugin, () -> {
 					mob.tracker.stopAnimation(anim);
 					mob.entity.removeScoreboardTag("healing");
 				}, 20*2);
+				return true;
+			}
+			break;
+		}
+		
+		case STOMP: {
+			if (force || (!mob.entity.getScoreboardTags().contains("stomping") && !mob.flying && target != null && distance < 10)) {
+				Location loc = mob.entity.getLocation();
+				mob.tracker.animate(anim);
+				Collection<PotionEffect> newEffects = new ArrayList<>();
+				newEffects.add(new PotionEffect(PotionEffectType.SLOWNESS, 20*2, 5, true, false));
+				mob.entity.addPotionEffects(newEffects);
+				
+				mob.entity.addScoreboardTag("stomping");
+				  double radius = mob.scale*3;
+				
+				 new BukkitRunnable() {
+					  int c = 0;
+					  @Override public void run() {
+						  if (sound != null)
+								Util.playSound(sound, loc);
+						  for (double x = -radius; x < radius; x++) {
+							  for (double z = -radius; z < radius; z++) {
+								  Block block = mob.entity.getLocation().add(x, -1, z).getBlock();
+								  mob.entity.getWorld().spawnParticle(Particle.BLOCK_CRUMBLE, mob.entity.getLocation().add(x, -0.5f, z), 5, 0.1f, 0.1f, 0.1f, 0.1f, block.getBlockData());
+								  mob.entity.getWorld().spawnParticle(Particle.EXPLOSION, mob.entity.getLocation().add(x, -0.5f, z), 1, 0, 0, 0, 0);
+							  }
+						  }
+						  for (LivingEntity le : mob.entity.getLocation().getNearbyLivingEntities(radius, radius/2, radius)) {
+							  if (le != mob.entity) {
+								  le.setVelocity(le.getLocation().subtract(mob.entity.getLocation()).toVector().normalize().add(new Vector(0, 1, 0)).multiply(1.5f));
+								  le.damage(3);
+							  }
+						  }
+						  if (c > 4) {
+							  mob.tracker.stopAnimation(anim);
+							  mob.entity.removeScoreboardTag("stomping");
+							  this.cancel();
+							  return;
+						  }
+						  c++;
+					  } 
+				 }.runTaskTimer(FancyMobs.plugin, 0L, 10L); // Run every 1 tick
+				
 				return true;
 			}
 			break;
