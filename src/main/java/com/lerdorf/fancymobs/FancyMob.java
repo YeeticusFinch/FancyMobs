@@ -79,6 +79,8 @@ public class FancyMob {
 	SpawnCondition spawnCondition;
 	
 	Tameable tameable;
+
+	int modelIndex = 0;
 	
 	public FancyMob(String name, int maxHp, float moveSpeed, float scale, String[] modelName, EntityType baseType, int alignment, HashMap<Attribute, Double> attributes, PotionEffect[] effects, Sound ambientSound, Sound hurtSound, Sound deathSound, int aggroRange, Attack[] attacks, Ability[] abilities, SpawnCondition spawnCondition, Tameable tameable, Drop[] drops, int minXp, int maxXp) {
 		this.name = name;
@@ -422,7 +424,8 @@ public class FancyMob {
 		}
 
 		// Register model and set scale
-		tracker = BetterModel.model(modelName[(int)(Math.random()*modelName.length)]).map(r -> r.getOrCreate(entity)).orElse(null);
+		modelIndex = (int)(Math.random()*modelName.length);
+		tracker = BetterModel.model(modelName[modelIndex]).map(r -> r.getOrCreate(entity)).orElse(null);
 		if (tracker != null) {
 			tracker.scaler(ModelScaler.value(scale));
 
@@ -510,7 +513,7 @@ public class FancyMob {
 					double health = entity.getHealth();
 					entity.remove();
 					entity = null;
-					modelName = new String[] {tameable.saddleModel};
+					modelName = new String[] {tameable.saddleModel[(int)Math.min(tameable.saddleModel.length-1, modelIndex)]};
 					player.getEquipment().getItemInMainHand().setAmount(player.getEquipment().getItemInMainHand().getAmount()-1);
 					
 					Bukkit.getScheduler().runTaskLater(FancyMobs.plugin, () -> {

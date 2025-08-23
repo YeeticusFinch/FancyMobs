@@ -440,13 +440,13 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 						new Ability(Ability.SPRINT, "sprinting", 5000)
 				},
 				new SpawnCondition(new int[] {SpawnCondition.onGround, SpawnCondition.specificFloorTypes, SpawnCondition.specificDimensions}, null, new Material[] {Material.GRASS_BLOCK, Material.DIRT, Material.COARSE_DIRT}, new Environment[] {Environment.NORMAL}),
-				new Tameable(new Material[] {Material.BEEF, Material.PORKCHOP, Material.CHICKEN, Material.MUTTON, Material.RABBIT}, new ItemStack(Material.SADDLE), true, "suchomimmus.saddle"),
+				new Tameable(new Material[] {Material.BEEF, Material.PORKCHOP, Material.CHICKEN, Material.MUTTON, Material.RABBIT}, new ItemStack(Material.SADDLE), true, new String[]{"suchomimmus.saddle"}),
 				new Drop[] {
 						new Drop(rawDinosaurMeat, 0.3f, 0, 2)
 				}, 0, 2
 				));
 		
-		mobRegistry.put("allosaurus", new FancyMob("Allosaurus", 86, 0.3f, 1.8f, new String[] {"allosaurus"}, EntityType.POLAR_BEAR,
+		mobRegistry.put("allosaurus", new FancyMob("Allosaurus", 86, 0.3f, 1.5f, new String[] {"allosaurus", "allosaurus_2", "allosaurus_3", "allosaurus_4"}, EntityType.POLAR_BEAR,
 				FancyMob.HOSTILE, new HashMap<>() {
 					{
 						put(Attribute.ARMOR, 14d);
@@ -485,13 +485,13 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 						new Ability(Ability.SURRENDER, "surrender", 1000, Sound.sound(Key.key("minecraft:entity.wolf.death"), Source.HOSTILE, 1, 0.5f))
 				},
 				new SpawnCondition(new int[] {SpawnCondition.onGround, SpawnCondition.specificFloorTypes, SpawnCondition.specificDimensions}, null, new Material[] {Material.GRASS_BLOCK, Material.DIRT, Material.COARSE_DIRT}, new Environment[] {Environment.NORMAL}),
-				new Tameable(new ItemStack[] {rawDinosaurMeat, cookedDinosaurMeat}, new ItemStack(Material.SADDLE), true, "allosaurus_saddle"),
+				new Tameable(new ItemStack[] {rawDinosaurMeat, cookedDinosaurMeat}, new ItemStack(Material.SADDLE), true, new String[] {"allosaurus_saddle", "allosaurus_2_saddle", "allosaurus_3_saddle", "allosaurus_4_saddle"}),
 				new Drop[] {
 						new Drop(rawDinosaurMeat, 0.3f, 0, 2)
 				}, 0, 2
 				));
 		
-		mobRegistry.put("shunosaurus", new FancyMob("Shunosaurus", 75, 0.2f, 1.5f, new String[] {"shunosaurus", "shunosaurus_2", "shunosaurus_3", "shunosaurus_4"}, EntityType.COW,
+		mobRegistry.put("shunosaurus", new FancyMob("Shunosaurus", 75, 0.2f, 1.3f, new String[] {"shunosaurus", "shunosaurus_2", "shunosaurus_3", "shunosaurus_4"}, EntityType.COW,
 				FancyMob.PEACEFUL, new HashMap<>() {
 					{
 						put(Attribute.ARMOR, 5d);

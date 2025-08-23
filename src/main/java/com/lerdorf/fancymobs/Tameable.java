@@ -14,17 +14,17 @@ public class Tameable {
 	public boolean saddleable;
 	public boolean tamed = false;
 	public float tameChance = 0.3f;
-	public String saddleModel;
+	public String[] saddleModel;
 	public boolean saddled = false;
 	
-	public Tameable(Material[] tameMaterial, ItemStack saddleItem, boolean saddleable, String saddleModel) {
+	public Tameable(Material[] tameMaterial, ItemStack saddleItem, boolean saddleable, String[] saddleModel) {
 		this.tameMaterial = tameMaterial;
 		this.saddleItem = saddleItem;
 		this.saddleable = saddleable;
 		this.saddleModel = saddleModel;
 	}
 	
-	public Tameable(Material[] tameMaterial, ItemStack saddleItem, boolean saddleable, String saddleModel, float tameChance) {
+	public Tameable(Material[] tameMaterial, ItemStack saddleItem, boolean saddleable, String[] saddleModel, float tameChance) {
 		this.tameMaterial = tameMaterial;
 		this.saddleItem = saddleItem;
 		this.saddleable = saddleable;
@@ -32,7 +32,7 @@ public class Tameable {
 		this.saddleModel = saddleModel;
 	}
 
-	public Tameable(ItemStack[] tameItems, ItemStack saddleItem, boolean saddleable, String saddleModel) {
+	public Tameable(ItemStack[] tameItems, ItemStack saddleItem, boolean saddleable, String[] saddleModel) {
 		this.tameItems = tameItems;
 		this.saddleItem = saddleItem;
 		this.saddleable = saddleable;
