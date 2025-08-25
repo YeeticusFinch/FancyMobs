@@ -35,9 +35,11 @@ repositories {
 // For Minecraft 1.21.8
 dependencies {
     paperweight.paperDevBundle("1.21.8-R0.1-SNAPSHOT")
+    //compileOnly fileTree(dir: 'libs', include: ['*.jar'])
     compileOnly 'de.tr7zw:item-nbt-api-plugin:2.15.1'
     compileOnly("io.github.toxicity188:BetterModel:1.11.0")
     compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.3.16-SNAPSHOT")
+    compileOnly files("../FancyMagic/build/libs/FancyMagic-1.0.jar")
     //implementation("io.papermc.paper:paper-mojangapi:1.21.8-R0.1-SNAPSHOT") // not always available
     //paperDevBundle("1.21.8-R0.1-SNAPSHOT")
     // If you're using Folia or a fork:

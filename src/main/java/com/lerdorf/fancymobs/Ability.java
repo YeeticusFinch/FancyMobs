@@ -50,12 +50,17 @@ public class Ability {
 	public static final int SURRENDER = 10;
 	public static final int HEAL = 11;
 	public static final int STOMP = 12;
+	public static final int SPELL = 13;
 
+	com.lerdorf.fancymagic.Spell spell = null;
+	ItemStack focus;
+	
 	int id;
 	String anim;
 	long cooldown;
 	long lastShot = 0;
 	net.kyori.adventure.sound.Sound sound;
+	
 
 	public Ability(int id, String anim, long cooldown) {
 		this.id = id;
@@ -68,6 +73,15 @@ public class Ability {
 		this.anim = anim;
 		this.cooldown = cooldown;
 		this.sound = sound;
+	}
+	
+
+	public Ability(int id, String anim, long cooldown, com.lerdorf.fancymagic.Spell spell, ItemStack focus) {
+		this.id = id;
+		this.anim = anim;
+		this.cooldown = cooldown;
+		this.spell = spell;
+		this.focus = focus;
 	}
 
 	public boolean act(FancyMob mob, LivingEntity target, boolean force) {
@@ -91,6 +105,24 @@ public class Ability {
 			}
 		}
 		switch (id) {
+		case SPELL: {
+			boolean spellReq = false;
+			if (spell.data.name.toLowerCase().contains("bolt") || spell.data.name.toLowerCase().contains("knife") || spell.data.name.equalsIgnoreCase("Enervation") || spell.data.name.equalsIgnoreCase("Disintegrate") || spell.data.name.toLowerCase().contains("lightning")) {
+				spellReq = (distance > 5 && distance < 90);
+			} 
+			else if (spell.data.name.toLowerCase().contains("storm") || spell.data.name.toLowerCase().contains("barrage")) {
+				spellReq = (distance > 4 && distance < 60);
+			}
+			else if (spell.data.name.equalsIgnoreCase("Levitation") || spell.data.name.equalsIgnoreCase("Raise Dead")) {
+				spellReq = true;
+			}
+			if (force || spellReq) {
+				mob.tracker.animate(anim);
+				spell.cast(mob.entity, focus, 1.1f, 0.5f, 1.1f, false);
+				//spell.cast(target, null, ENERVATION, DIVE, DISINTEGRATE, force)
+			}
+			break;
+		}
 		case RED_LASER: {
 			if (force || (distance > 5 && distance < 60 && !mob.flying)) {
 				mob.entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 2*20, 10, true,  false));

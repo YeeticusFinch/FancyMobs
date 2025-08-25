@@ -13,6 +13,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
 
+import com.lerdorf.fancymagic.*;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.Arrays;
@@ -85,6 +86,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.SmokingRecipe;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.components.EquippableComponent;
 import org.bukkit.inventory.meta.components.FoodComponent;
@@ -446,7 +448,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				}, 0, 2
 				));
 		
-		mobRegistry.put("allosaurus", new FancyMob("Allosaurus", 86, 0.3f, 1.5f, new String[] {"allosaurus", "allosaurus_2", "allosaurus_3", "allosaurus_4"}, EntityType.POLAR_BEAR,
+		mobRegistry.put("allosaurus", new FancyMob("Allosaurus", 86, 0.3f, 1.4f, new String[] {"allosaurus", "allosaurus_2", "allosaurus_3", "allosaurus_4"}, EntityType.POLAR_BEAR,
 				FancyMob.HOSTILE, new HashMap<>() {
 					{
 						put(Attribute.ARMOR, 14d);
@@ -457,9 +459,9 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				new PotionEffect[] {
 						//new PotionEffect(PotionEffectType.WATER_BREATHING, Integer.MAX_VALUE, 3, true, false)
 					},
-				Sound.sound(Key.key("yeet:allo_idle"), Source.NEUTRAL, 1.0f, 1.0f),
-				Sound.sound(Key.key("yeet:allo_hurt"), Source.NEUTRAL, 1.0f, 1.0f),
-				Sound.sound(Key.key("yeet:allo_death"), Source.NEUTRAL, 1.0f, 1.0f),
+				Sound.sound(Key.key("yeet:allosaurus_idle"), Source.NEUTRAL, 1.0f, 1.0f),
+				Sound.sound(Key.key("yeet:allosaurus_hurt"), Source.NEUTRAL, 1.0f, 1.0f),
+				Sound.sound(Key.key("yeet:allosaurus_death"), Source.NEUTRAL, 1.0f, 1.0f),
 				40,
 				new Attack[] { 
 						new Attack("attack", 13, new HashMap<>() {
@@ -478,8 +480,8 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				new Ability[] {
 						new Ability(Ability.SIT, "sit", 2000),
 						new Ability(Ability.SLEEP, "sleep", 20000),
-						new Ability(Ability.HEAL, "roar", 10000, Sound.sound(Key.key("yeet:allo_warn"), Source.HOSTILE, 1.0f, 1.0f)),
-						new Ability(Ability.HEAL, "roar2", 10000, Sound.sound(Key.key("yeet:allo_warn"), Source.HOSTILE, 1.0f, 1.0f)),
+						new Ability(Ability.HEAL, "roar", 10000, Sound.sound(Key.key("yeet:allosaurus_roar"), Source.HOSTILE, 1.0f, 1.0f)),
+						new Ability(Ability.HEAL, "roar2", 10000, Sound.sound(Key.key("yeet:allosaurus_roar"), Source.HOSTILE, 1.0f, 1.0f)),
 						new Ability(Ability.SHAKE, "sniffing", 10000, Sound.sound(Key.key("minecraft:entity.warden.sniff"), Source.HOSTILE, 1.0f, 0.7f)),
 						new Ability(Ability.SPRINT, "run", 5000),
 						new Ability(Ability.SURRENDER, "surrender", 1000, Sound.sound(Key.key("minecraft:entity.wolf.death"), Source.HOSTILE, 1, 0.5f))
@@ -693,11 +695,13 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				}, 0, 3
 				));
 		
-		mobRegistry.put("thalassodromeu", new FancyMob("Thalassodromeu", 20, 0.2f, 1.1f, new String[] {"thalassodromeu_dinosauria", "thalassodromeu_dinosauria_2", "thalassodromeu_dinosauria_3", "thalassodromeu_dinosauria_4", "thalassodromeu_dinosauria_5"}, EntityType.VINDICATOR,
+		mobRegistry.put("thalassodromeu", new FancyMob("Thalassodromeu", 22, 0.2f, 1.1f, new String[] {"thalassodromeu_dinosauria", "thalassodromeu_dinosauria_2", "thalassodromeu_dinosauria_3", "thalassodromeu_dinosauria_4", "thalassodromeu_dinosauria_5"}, EntityType.VINDICATOR,
 				FancyMob.HOSTILE, new HashMap<>() {
 					{
 						put(Attribute.ARMOR, 5d);
 						put(Attribute.FLYING_SPEED, 0.6d);
+						put(Attribute.FALL_DAMAGE_MULTIPLIER, 0.2d);
+						put(Attribute.SAFE_FALL_DISTANCE, 20d);
 					}
 				},
 				new PotionEffect[] {
@@ -725,6 +729,51 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 						new Ability(Ability.SIT, "sit", 6000),
 						new Ability(Ability.ROAR, "clean", 6000),
 						new Ability(Ability.ROAR, "shake", 6000),
+						new Ability(Ability.SLEEP, "sleep", 20000),
+						new Ability(Ability.FLY, "flap", 200),
+						new Ability(Ability.GLIDE, "fly", 200),
+						new Ability(Ability.DIVE, "fly_dive", 800)
+				},
+				new SpawnCondition(new int[] {SpawnCondition.onGround, SpawnCondition.specificFloorTypes, SpawnCondition.specificDimensions}, null, new Material[] {Material.GRASS_BLOCK, Material.DIRT, Material.COARSE_DIRT}, new Environment[] {Environment.NORMAL}),
+				null,
+				new Drop[] {
+						new Drop(rawDinosaurMeat, 0.1f, 0, 1)
+				}, 2, 6
+				));
+		
+
+		mobRegistry.put("tropeognathus", new FancyMob("Tropeognathus", 18, 0.2f, 1f, new String[] {"tropeognathus"}, EntityType.VINDICATOR,
+				FancyMob.HOSTILE, new HashMap<>() {
+					{
+						put(Attribute.ARMOR, 4d);
+						put(Attribute.FLYING_SPEED, 0.6d);
+						put(Attribute.FALL_DAMAGE_MULTIPLIER, 0.2d);
+						put(Attribute.SAFE_FALL_DISTANCE, 20d);
+					}
+				},
+				new PotionEffect[] {
+						//new PotionEffect(PotionEffectType.WATER_BREATHING, Integer.MAX_VALUE, 3, true, false)
+					},
+				Sound.sound(Key.key("yeet:spino_idle"), Source.HOSTILE, 1.0f, 1.5f),
+				Sound.sound(Key.key("yeet:spino_hurt"), Source.HOSTILE, 1.0f, 1.5f),
+				Sound.sound(Key.key("yeet:spino_death"), Source.HOSTILE, 1.0f, 1.5f),
+				70,
+				new Attack[] { 
+						new Attack("peck", 3.5f, new HashMap<>() {
+								{
+									//put(Attack.SLOWNESS, 2d);
+								}
+							}, 3, 900
+						),
+						new Attack("double_peck", 6, new HashMap<>() {
+							{
+								//put(Attack.SLOWNESS, 4d);
+							}
+						}, 3, 1900
+					)
+				},
+				new Ability[] {
+						new Ability(Ability.SIT, "sit", 6000),
 						new Ability(Ability.SLEEP, "sleep", 20000),
 						new Ability(Ability.FLY, "flap", 200),
 						new Ability(Ability.GLIDE, "fly", 200),
@@ -779,6 +828,114 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				}, 2, 7
 				));
 		
+
+		mobRegistry.put("pliosaurus", new FancyMob("Pliosaurus", 90, 0.36f, 1.5f, new String[] {"pliosaurus", "pliosaurus_2", "pliosaurus_3", "pliosaurus_4", "pliosaurus_5"}, EntityType.AXOLOTL,
+				FancyMob.HOSTILE, new HashMap<>() {
+					{
+						put(Attribute.ARMOR, 14d);
+						put(Attribute.WATER_MOVEMENT_EFFICIENCY, 0.5);
+					}
+				},
+				new PotionEffect[] {
+						new PotionEffect(PotionEffectType.WATER_BREATHING, Integer.MAX_VALUE, 3, true, false)
+					},
+				Sound.sound(Key.key("minecraft:entity.elder_guardian.idle"), Source.HOSTILE, 1.0f, 0.8f),
+				Sound.sound(Key.key("minecraft:entity.elder_guardian.hurt"), Source.HOSTILE, 1.0f, 0.8f),
+				Sound.sound(Key.key("minecraft:entity.elder_guardian.death"), Source.HOSTILE, 1.0f, 0.8f),
+				70,
+				new Attack[] { 
+						new Attack("attack_1", 11, new HashMap<>() {
+								{
+									put(Attack.SLOWNESS, 2d);
+								}
+							}, 6, 2000
+						),
+						new Attack("attack_2", 7, new HashMap<>() {
+							{
+								put(Attack.KNOCKBACK, 1.7d);
+								put(Attack.KNOCKUP, 1d);
+							}
+						}, 6, 3000
+					),new Attack("attack_3", 9, new HashMap<>() {
+						{
+							//put(Attack.KNOCKBACK, 1.7d);
+							//put(Attack.KNOCKUP, 1d);
+						}
+					}, 6, 1500
+				),new Attack("attack_4", 8, new HashMap<>() {
+					{
+						put(Attack.KNOCKBACK, 2.2d);
+						//put(Attack.KNOCKUP, 1d);
+					}
+				}, 6, 16000
+			)
+				},
+				new Ability[] {
+						new Ability(Ability.SLEEP, "sleep", 40000)
+				},
+				new SpawnCondition(new int[] {SpawnCondition.inWater, SpawnCondition.specificDimensions}, null, new Material[] {Material.GRASS_BLOCK, Material.DIRT, Material.COARSE_DIRT}, new Environment[] {Environment.NORMAL}),
+				null,
+				new Drop[] {
+						new Drop(rawDinosaurMeat, 0.1f, 1, 3)
+				}, 3, 9
+				));
+		
+		ItemStack lichSpellbook = Items.SPELLBOOK.clone();
+    	BookMeta bmeta = (BookMeta) lichSpellbook.getItemMeta();
+    	bmeta.setAuthor(ChatColor.LIGHT_PURPLE + "Lich");
+    	bmeta.setTitle("Spellbook");
+    	lichSpellbook.setItemMeta(bmeta);
+    	Items.addSpell(lichSpellbook, "Necrotic Bolt", 3);
+    	Items.addSpell(lichSpellbook, "Necrotic Storm", 2);
+    	Items.addSpell(lichSpellbook, "Enervation", 1);
+    	Items.addSpell(lichSpellbook, "Raise Dead", 1);
+    	
+    	ItemStack lichFocus = Items.getFocus(Items.focusBases.get(Material.NETHERITE_INGOT), Items.focusCores.get(Material.NETHER_STAR), new Triple<>("Staff", 1.5f, 1.5f));
+    	
+		mobRegistry.put("lich", new FancyMob("Lich", 70, 0.2f, 1.6f, new String[] {"lich"}, EntityType.EVOKER,
+				FancyMob.HOSTILE, new HashMap<>() {
+					{
+						put(Attribute.ARMOR, 10d);
+						put(Attribute.FALL_DAMAGE_MULTIPLIER, 0.2d);
+						put(Attribute.SAFE_FALL_DISTANCE, 10d);
+						//put(Attribute.WATER_MOVEMENT_EFFICIENCY, 0.5);
+					}
+				},
+				new PotionEffect[] {
+						//new PotionEffect(PotionEffectType.WATER_BREATHING, Integer.MAX_VALUE, 3, true, false)
+					},
+				Sound.sound(Key.key("minecraft:entity.wither.ambient"), Source.HOSTILE, 1.0f, 1.6f),
+				Sound.sound(Key.key("minecraft:entity.wither.hurt"), Source.HOSTILE, 1.0f, 1.6f),
+				Sound.sound(Key.key("minecraft:entity.wither.death"), Source.HOSTILE, 1.0f, 1.6f),
+				40,
+				new Attack[] { 
+						new Attack("melee", 6, new HashMap<>() {
+							{
+								put(Attack.SWEEP, 0.6);
+								put(Attack.KNOCKBACK, 0.7);
+							}
+						}, 4, 600
+					)
+				},
+				new Ability[] {
+						new Ability(Ability.SPELL, "attack_spell", 4000, new Spell(Spell.NECROTIC_BOLT, 4, 0), lichFocus.clone()),
+						new Ability(Ability.SPELL, "attack_spell", 9000, new Spell(Spell.NECROTIC_STORM, 4, 0), lichFocus.clone()),
+						new Ability(Ability.SPELL, "fly", 16000, new Spell(Spell.LEVITATION, 4, 0), lichFocus.clone()),
+						new Ability(Ability.SPELL, "self_spell", 30000, new Spell(Spell.RAISE_DEAD, 3, 0), lichFocus.clone()),
+						new Ability(Ability.SPELL, "attack_spell", 20000, new Spell(Spell.ENERVATION, 3, 0), lichFocus.clone()),
+						new Ability(Ability.SPELL, "attack_spell", 15000, new Spell(Spell.LIGHTNING, 2, 0), lichFocus.clone()),
+						new Ability(Ability.SPELL, "attack_spell", 15000, new Spell(Spell.DISINTEGRATE, 2, 0), lichFocus.clone())
+				},
+				null,
+				null,
+				new Drop[] {
+						new Drop(lichFocus.clone(), 0.4f, 0, 1),
+						new Drop(lichSpellbook.clone(), 0.1f, 0, 1),
+						new Drop(Spell.RAISE_DEAD.getScroll().clone(), 0.4f, 0, 1)
+				}, 6, 9
+				));
+		
+		//Tyrannosaurus_rex
 	}
 
 	public void loadConfig() {
@@ -1072,6 +1229,8 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 		Entity damager = event.getDamager();
 
 		if (damager instanceof LivingEntity living && living.getScoreboardTags().contains("fm_mob")) {
+			if (event.getEntity() == damager)
+				event.setCancelled(true);
 			FancyMob fancyMob = getFancyMob(living);
 			if (fancyMob != null) {
 				if (fancyMob.surrendering)
