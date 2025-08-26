@@ -135,6 +135,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 	private static ItemStack dinosaurBoots;
 	private static ItemStack ironPlate;
 	private static ItemStack club;
+	private static ItemStack trex_saddle;
 	
 	public static Collection<NamespacedKey> recipes = new ArrayList<>();
 	
@@ -239,6 +240,15 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 			
 			setItemMeta(meta);
 		}};
+
+		trex_saddle = new ItemStack(Material.FLINT, 1) {{
+			ItemMeta meta = getItemMeta();
+			meta.setItemModel(NamespacedKey.fromString("yeet:trex_saddle"));
+			meta.setDisplayName(ChatColor.YELLOW + "T-Rex Saddle");
+			
+			setItemMeta(meta);
+		}};
+		
 		
 		 // Furnace recipe
 	    NamespacedKey furnaceKey = new NamespacedKey(this, "cooked_dino_furnace");
@@ -330,6 +340,23 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 
 		Bukkit.addRecipe(recipe);
 	    recipes.add(key);
+
+	    
+		key = new NamespacedKey(plugin, "trex_saddle");
+
+		recipe = new ShapedRecipe(key, trex_saddle);
+		recipe.shape(
+				"PSB",
+				"L L", 
+				"T T");
+		recipe.setIngredient('P', Material.DECORATED_POT);
+		recipe.setIngredient('S', Material.SADDLE);
+		recipe.setIngredient('B', Material.BARREL);
+		recipe.setIngredient('L', Material.LEATHER);
+		recipe.setIngredient('S', Material.STRING);
+
+		Bukkit.addRecipe(recipe);
+	    recipes.add(key);
 	}
 	
 	public void loadMobRegistry() {
@@ -346,6 +373,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				Sound.sound(Key.key("yeet:gulag"), Source.HOSTILE, 1.0f, 1.0f),
 				Sound.sound(Key.key("yeet:soviet_hurt"), Source.HOSTILE, 1.0f, 1.0f),
 				Sound.sound(Key.key("yeet:soviet_death"), Source.HOSTILE, 1.0f, 1.0f),
+				Sound.sound(Key.key("minecraft:entity.iron_golem.step"), Source.NEUTRAL, 1.0f, 0.9f),
 				80,
 				new Attack[] { 
 						new Attack("attack", 10, new HashMap<>() {
@@ -386,6 +414,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				Sound.sound(Key.key("yeet:barina_idle"), Source.NEUTRAL, 1.0f, 1.0f),
 				Sound.sound(Key.key("yeet:barina_hurt"), Source.NEUTRAL, 1.0f, 1.0f),
 				Sound.sound(Key.key("yeet:barina_death"), Source.NEUTRAL, 1.0f, 1.0f),
+				Sound.sound(Key.key("minecraft:entity.polar_bear.step"), Source.NEUTRAL, 1.0f, 1f),
 				70,
 				new Attack[] { 
 						new Attack("attack_1", 8, new HashMap<>() {
@@ -425,6 +454,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				Sound.sound(Key.key("yeet:spino_idle"), Source.NEUTRAL, 1.0f, 1.0f),
 				Sound.sound(Key.key("yeet:spino_hurt"), Source.NEUTRAL, 1.0f, 1.0f),
 				Sound.sound(Key.key("yeet:spino_death"), Source.NEUTRAL, 1.0f, 1.0f),
+				Sound.sound(Key.key("yeet:trex_step"), Source.HOSTILE, 1.0f, 1.7f),
 				40,
 				new Attack[] { 
 						new Attack("bite", 7, new HashMap<>() {
@@ -462,6 +492,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				Sound.sound(Key.key("yeet:allosaurus_idle"), Source.NEUTRAL, 1.0f, 1.0f),
 				Sound.sound(Key.key("yeet:allosaurus_hurt"), Source.NEUTRAL, 1.0f, 1.0f),
 				Sound.sound(Key.key("yeet:allosaurus_death"), Source.NEUTRAL, 1.0f, 1.0f),
+				Sound.sound(Key.key("yeet:trex_step"), Source.HOSTILE, 1.0f, 1.3f),
 				40,
 				new Attack[] { 
 						new Attack("attack", 13, new HashMap<>() {
@@ -490,7 +521,53 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				new Tameable(new ItemStack[] {rawDinosaurMeat, cookedDinosaurMeat}, new ItemStack(Material.SADDLE), true, new String[] {"allosaurus_saddle", "allosaurus_2_saddle", "allosaurus_3_saddle", "allosaurus_4_saddle"}),
 				new Drop[] {
 						new Drop(rawDinosaurMeat, 0.3f, 0, 2)
-				}, 0, 2
+				}, 0, 7
+				));
+		
+		mobRegistry.put("tyrannosaurus_rex", new FancyMob("Tyrannosaurus Rex", 86, 0.3f, 1.4f, new String[] {"tyrannosaurus_rex", "tyrannosaurus_rex_2"}, EntityType.POLAR_BEAR,
+				FancyMob.HOSTILE, new HashMap<>() {
+					{
+						put(Attribute.ARMOR, 14d);
+						put(Attribute.WATER_MOVEMENT_EFFICIENCY, 0.5);
+						put(Attribute.STEP_HEIGHT, 2d);
+					}
+				},
+				new PotionEffect[] {
+						//new PotionEffect(PotionEffectType.WATER_BREATHING, Integer.MAX_VALUE, 3, true, false)
+					},
+				Sound.sound(Key.key("yeet:allosaurus_idle"), Source.HOSTILE, 1.0f, 0.9f),
+				Sound.sound(Key.key("yeet:trex_hurt"), Source.HOSTILE, 1.0f, 1.0f),
+				Sound.sound(Key.key("yeet:trex_death"), Source.HOSTILE, 1.0f, 1.0f),
+				Sound.sound(Key.key("yeet:trex_step"), Source.HOSTILE, 1.0f, 1.0f),
+				90,
+				new Attack[] { 
+						new Attack("attack", 13, new HashMap<>() {
+							{
+								put(Attack.SLOWNESS, 2d);
+							}
+						}, 5, 2000, Sound.sound(Key.key("yeet:trex_attack"), Source.HOSTILE, 1.0f, 1.0f)
+					),
+						new Attack("attack2", 11, new HashMap<>() {
+							{
+								//put(Attack.KNOCKBACK, 1.5d);
+							}
+						}, 5, 1000, Sound.sound(Key.key("yeet:trex_attack"), Source.HOSTILE, 1.0f, 0.9f)
+					)
+				},
+				new Ability[] {
+						new Ability(Ability.SIT, "sit", 2000),
+						new Ability(Ability.SLEEP, "sleep", 20000),
+						new Ability(Ability.HEAL, "roar", 10000, Sound.sound(Key.key("yeet:trex_roar"), Source.HOSTILE, 1.0f, 1.0f)),
+						new Ability(Ability.HEAL, "target_roaring", 10000, Sound.sound(Key.key("yeet:trex_roar"), Source.HOSTILE, 1.0f, 1.0f)),
+						new Ability(Ability.SHAKE, "shake", 10000, Sound.sound(Key.key("minecraft:entity.wolf.shake"), Source.HOSTILE, 1.0f, 0.6f)),
+						new Ability(Ability.SPRINT, "run", 5000),
+						new Ability(Ability.SURRENDER, "surrender", 1000, Sound.sound(Key.key("minecraft:entity.wolf.death"), Source.HOSTILE, 1, 0.5f))
+				},
+				new SpawnCondition(new int[] {SpawnCondition.onGround, SpawnCondition.specificFloorTypes, SpawnCondition.specificDimensions}, null, new Material[] {Material.GRASS_BLOCK, Material.DIRT, Material.COARSE_DIRT}, new Environment[] {Environment.NORMAL}),
+				new Tameable(new ItemStack[] {rawDinosaurMeat, cookedDinosaurMeat}, trex_saddle, true, new String[] {"tyrannosaurus_rex_saddle", "tyrannosaurus_rex_2_saddle"}),
+				new Drop[] {
+						new Drop(rawDinosaurMeat, 0.3f, 0, 3)
+				}, 2, 9
 				));
 		
 		mobRegistry.put("shunosaurus", new FancyMob("Shunosaurus", 75, 0.2f, 1.3f, new String[] {"shunosaurus", "shunosaurus_2", "shunosaurus_3", "shunosaurus_4"}, EntityType.COW,
@@ -506,6 +583,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				Sound.sound(Key.key("yeet:stego_idle"), Source.NEUTRAL, 1.0f, 0.6f),
 				Sound.sound(Key.key("yeet:stego_hurt"), Source.NEUTRAL, 1.0f, 0.6f),
 				Sound.sound(Key.key("yeet:stego_angry"), Source.NEUTRAL, 1.0f, 0.6f),
+				Sound.sound(Key.key("minecraft:entity.polar_bear.step"), Source.NEUTRAL, 1.0f, 1f),
 				70,
 				new Attack[] { 
 						new Attack("neck attack", 6, new HashMap<>() {
@@ -550,6 +628,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				Sound.sound(Key.key("yeet:ogre"), Source.HOSTILE, 1.0f, 1.0f),
 				Sound.sound(Key.key("yeet:ogre_hurt"), Source.HOSTILE, 1.0f, 1.0f),
 				Sound.sound(Key.key("yeet:ogre_hurt"), Source.HOSTILE, 1.0f, 1.0f),
+				Sound.sound(Key.key("minecraft:entity.polar_bear.step"), Source.NEUTRAL, 1.0f, 1.2f),
 				40,
 				new Attack[] { 
 						new Attack("attack", 8, new HashMap<>() {
@@ -585,6 +664,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				Sound.sound(Key.key("yeet:stego_idle"), Source.NEUTRAL, 1.0f, 1.0f),
 				Sound.sound(Key.key("yeet:stego_hurt"), Source.NEUTRAL, 1.0f, 1.0f),
 				Sound.sound(Key.key("yeet:stego_angry"), Source.NEUTRAL, 1.0f, 1.0f),
+				Sound.sound(Key.key("minecraft:entity.polar_bear.step"), Source.NEUTRAL, 1.0f, 1f),
 				70,
 				new Attack[] { 
 						new Attack("attack", 6, new HashMap<>() {
@@ -604,6 +684,40 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 						new Drop(rawDinosaurMeat, 0.1f, 1, 2)
 				}, 0, 2
 				));
+		
+		mobRegistry.put("gigantopithecus", new FancyMob("Gigantopithecus", 45, 0.28f, 0.95f, new String[] {"gigantopithecus"}, EntityType.POLAR_BEAR,
+				FancyMob.NEUTRAL, new HashMap<>() {
+					{
+						put(Attribute.ARMOR, 4d);
+						put(Attribute.STEP_HEIGHT, 2d);
+						//put(Attribute.WATER_MOVEMENT_EFFICIENCY, 0.5);
+					}
+				},
+				new PotionEffect[] {
+						new PotionEffect(PotionEffectType.JUMP_BOOST, Integer.MAX_VALUE, 2, true, false)
+					},
+				Sound.sound(Key.key("yeet:gigantopithecus_idle"), Source.NEUTRAL, 1.0f, 1.0f),
+				Sound.sound(Key.key("yeet:gigantopithecus_hurt"), Source.NEUTRAL, 1.0f, 1.0f),
+				Sound.sound(Key.key("yeet:gigantopithecus_death"), Source.NEUTRAL, 1.0f, 1.0f),
+				Sound.sound(Key.key("minecraft:entity.cow.step"), Source.NEUTRAL, 1.0f, 0.9f),
+				70,
+				new Attack[] { 
+						new Attack("attack", 6, new HashMap<>() {
+								{
+									put(Attack.KNOCKBACK, 1.5d);
+								}
+							}, 3, 900
+						)
+				},
+				new Ability[] {
+						//new Ability(Ability.ROAR, "warn", 2000)
+				},
+				new SpawnCondition(new int[] {SpawnCondition.onGround, SpawnCondition.specificFloorTypes, SpawnCondition.specificDimensions}, null, new Material[] {Material.GRASS_BLOCK, Material.DIRT, Material.COARSE_DIRT}, new Environment[] {Environment.NORMAL}),
+				null,
+				new Drop[] {
+						
+				}, 0, 3
+				));
 
 		mobRegistry.put("neovenator", new FancyMob("Neovenator", 40, 0.3f, 0.75f, new String[] {"neovenator_dinosauria", "neovenator_dinosauria_2", "neovenator_dinosauria_3", "neovenator_dinosauria_4", "neovenator_dinosauria_5"}, EntityType.POLAR_BEAR,
 				FancyMob.HOSTILE, new HashMap<>() {
@@ -618,6 +732,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				Sound.sound(Key.key("yeet:neo_idle"), Source.HOSTILE, 1.0f, 1f),
 				Sound.sound(Key.key("yeet:neo_hurt"), Source.HOSTILE, 1.0f, 1f),
 				Sound.sound(Key.key("yeet:neo_death"), Source.HOSTILE, 1.0f, 1f),
+				Sound.sound(Key.key("minecraft:entity.polar_bear.step"), Source.NEUTRAL, 1.0f, 1.2f),
 				70,
 				new Attack[] { 
 						new Attack("attack_bite", 7, new HashMap<>() {
@@ -677,6 +792,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				Sound.sound(Key.key("yeet:cory_idle"), Source.VOICE, 1.0f, 1f),
 				Sound.sound(Key.key("yeet:cory_hurt"), Source.VOICE, 1.0f, 1f),
 				Sound.sound(Key.key("yeet:cory_hurt"), Source.VOICE, 1.0f, 1f),
+				Sound.sound(Key.key("minecraft:entity.chicken.step"), Source.NEUTRAL, 1.0f, 0.8f),
 				70,
 				new Attack[] { 
 						
@@ -710,6 +826,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				Sound.sound(Key.key("yeet:spino_idle"), Source.HOSTILE, 1.0f, 1.4f),
 				Sound.sound(Key.key("yeet:spino_hurt"), Source.HOSTILE, 1.0f, 1.4f),
 				Sound.sound(Key.key("yeet:spino_death"), Source.HOSTILE, 1.0f, 1.4f),
+				Sound.sound(Key.key("minecraft:entity.polar_bear.step"), Source.NEUTRAL, 1.0f, 1.5f),
 				70,
 				new Attack[] { 
 						new Attack("peck", 4, new HashMap<>() {
@@ -757,6 +874,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				Sound.sound(Key.key("yeet:spino_idle"), Source.HOSTILE, 1.0f, 1.5f),
 				Sound.sound(Key.key("yeet:spino_hurt"), Source.HOSTILE, 1.0f, 1.5f),
 				Sound.sound(Key.key("yeet:spino_death"), Source.HOSTILE, 1.0f, 1.5f),
+				null,
 				70,
 				new Attack[] { 
 						new Attack("peck", 3.5f, new HashMap<>() {
@@ -799,6 +917,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				Sound.sound(Key.key("yeet:allosaurus_idle"), Source.HOSTILE, 1.0f, 0.8f),
 				Sound.sound(Key.key("yeet:allosaurus_hurt"), Source.HOSTILE, 1.0f, 0.8f),
 				Sound.sound(Key.key("yeet:allosaurus_death"), Source.HOSTILE, 1.0f, 0.8f),
+				null,
 				70,
 				new Attack[] { 
 						new Attack("bite_attack", 11, new HashMap<>() {
@@ -829,7 +948,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				));
 		
 
-		mobRegistry.put("pliosaurus", new FancyMob("Pliosaurus", 90, 0.36f, 1.5f, new String[] {"pliosaurus", "pliosaurus_2", "pliosaurus_3", "pliosaurus_4", "pliosaurus_5"}, EntityType.AXOLOTL,
+		mobRegistry.put("pliosaurus", new FancyMob("Pliosaurus", 90, 0.3f, 1.5f, new String[] {"pliosaurus", "pliosaurus_2", "pliosaurus_3", "pliosaurus_4", "pliosaurus_5"}, EntityType.AXOLOTL,
 				FancyMob.HOSTILE, new HashMap<>() {
 					{
 						put(Attribute.ARMOR, 14d);
@@ -842,6 +961,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				Sound.sound(Key.key("minecraft:entity.elder_guardian.idle"), Source.HOSTILE, 1.0f, 0.8f),
 				Sound.sound(Key.key("minecraft:entity.elder_guardian.hurt"), Source.HOSTILE, 1.0f, 0.8f),
 				Sound.sound(Key.key("minecraft:entity.elder_guardian.death"), Source.HOSTILE, 1.0f, 0.8f),
+				null,
 				70,
 				new Attack[] { 
 						new Attack("attack_1", 11, new HashMap<>() {
@@ -880,6 +1000,72 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				}, 3, 9
 				));
 		
+		mobRegistry.put("livyatan", new FancyMob("Livyatan", 80, 0.2f, 1.8f, new String[] {"livyatan"}, EntityType.AXOLOTL,
+				FancyMob.NEUTRAL, new HashMap<>() {
+					{
+						put(Attribute.ARMOR, 10d);
+						put(Attribute.WATER_MOVEMENT_EFFICIENCY, 0.2);
+					}
+				},
+				new PotionEffect[] {
+						new PotionEffect(PotionEffectType.WATER_BREATHING, Integer.MAX_VALUE, 3, true, false)
+					},
+				Sound.sound(Key.key("minecraft:entity.dolphin.idle"), Source.HOSTILE, 1.0f, 0.6f),
+				Sound.sound(Key.key("minecraft:entity.dolphin.hurt"), Source.HOSTILE, 1.0f, 0.6f),
+				Sound.sound(Key.key("minecraft:entity.dolphin.death"), Source.HOSTILE, 1.0f, 0.6f),
+				null,
+				70,
+				new Attack[] { 
+						new Attack("attack", 9, new HashMap<>() {
+								{
+									//put(Attack.SLOWNESS, 2d);
+								}
+							}, 7, 2000
+						)
+				},
+				new Ability[] {
+						//new Ability(Ability.SLEEP, "sleep", 40000)
+				},
+				new SpawnCondition(new int[] {SpawnCondition.inWater, SpawnCondition.specificDimensions}, null, new Material[] {Material.GRASS_BLOCK, Material.DIRT, Material.COARSE_DIRT}, new Environment[] {Environment.NORMAL}),
+				null,
+				new Drop[] {
+						new Drop(rawDinosaurMeat, 0.1f, 1, 5)
+				}, 1, 6
+				));
+		
+		mobRegistry.put("megalodon", new FancyMob("Megalodon", 80, 0.25f, 1.2f, new String[] {"megalodon"}, EntityType.AXOLOTL,
+				FancyMob.HOSTILE, new HashMap<>() {
+					{
+						put(Attribute.ARMOR, 15d);
+						put(Attribute.WATER_MOVEMENT_EFFICIENCY, 0.4);
+					}
+				},
+				new PotionEffect[] {
+						new PotionEffect(PotionEffectType.WATER_BREATHING, Integer.MAX_VALUE, 3, true, false)
+					},
+				Sound.sound(Key.key("minecraft:entity.elder_guardian.idle"), Source.HOSTILE, 1.0f, 0.9f),
+				Sound.sound(Key.key("minecraft:entity.elder_guardian.hurt"), Source.HOSTILE, 1.0f, 0.9f),
+				Sound.sound(Key.key("minecraft:entity.elder_guardian.death"), Source.HOSTILE, 1.0f, 0.9f),
+				null,
+				70,
+				new Attack[] { 
+						new Attack("attack", 10, new HashMap<>() {
+								{
+									//put(Attack.SLOWNESS, 2d);
+								}
+							}, 6, 1500
+						)
+				},
+				new Ability[] {
+						//new Ability(Ability.SLEEP, "sleep", 40000)
+				},
+				new SpawnCondition(new int[] {SpawnCondition.inWater, SpawnCondition.specificDimensions}, null, new Material[] {Material.GRASS_BLOCK, Material.DIRT, Material.COARSE_DIRT}, new Environment[] {Environment.NORMAL}),
+				null,
+				new Drop[] {
+						new Drop(rawDinosaurMeat, 0.1f, 1, 3)
+				}, 3, 9
+				));
+		
 		ItemStack lichSpellbook = Items.SPELLBOOK.clone();
     	BookMeta bmeta = (BookMeta) lichSpellbook.getItemMeta();
     	bmeta.setAuthor(ChatColor.LIGHT_PURPLE + "Lich");
@@ -907,6 +1093,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				Sound.sound(Key.key("minecraft:entity.wither.ambient"), Source.HOSTILE, 1.0f, 1.6f),
 				Sound.sound(Key.key("minecraft:entity.wither.hurt"), Source.HOSTILE, 1.0f, 1.6f),
 				Sound.sound(Key.key("minecraft:entity.wither.death"), Source.HOSTILE, 1.0f, 1.6f),
+				Sound.sound(Key.key("minecraft:entity.wither_skeleton.step"), Source.HOSTILE, 1.0f, 0.9f),
 				40,
 				new Attack[] { 
 						new Attack("melee", 6, new HashMap<>() {

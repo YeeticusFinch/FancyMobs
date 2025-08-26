@@ -1,5 +1,6 @@
 package com.lerdorf.fancymobs;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.entity.Entity;
@@ -7,6 +8,9 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+
+import net.kyori.adventure.sound.Sound;
 
 public class Attack {
 	
@@ -15,6 +19,7 @@ public class Attack {
 	double reach = -1;
 	long cooldown = 100;
 	Map<Integer, Double> props;
+	Sound sound = null;
 	
 	public static final int SWEEP = 0;
 	public static final int KNOCKBACK = 1;
@@ -38,7 +43,19 @@ public class Attack {
 		this.props = props;
 	}
 	
+	public Attack(String anim, double damage, Map<Integer, Double> props, double reach, long cooldown, @NotNull Sound sound) {
+		this.anim = anim;
+		this.damage = damage;
+		this.props = props;
+		this.reach = reach;
+		this.cooldown = cooldown;
+		this.sound = sound;
+	}
+
 	public void attack(LivingEntity source, LivingEntity target) {
+		if (sound != null) {
+			Util.playSound(sound, source.getLocation());
+		}
 		if (props != null && props.size() > 0) {
 			for (int prop : props.keySet()) {
 				double power = props.get(prop);

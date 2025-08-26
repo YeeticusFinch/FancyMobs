@@ -66,6 +66,7 @@ public class FancyMob {
 	public Sound ambientSound;
 	public Sound hurtSound;
 	public Sound deathSound;
+	public Sound stepSound;
 	
 	public int aggroRange = 64;
 	
@@ -82,7 +83,7 @@ public class FancyMob {
 
 	int modelIndex = 0;
 	
-	public FancyMob(String name, int maxHp, float moveSpeed, float scale, String[] modelName, EntityType baseType, int alignment, HashMap<Attribute, Double> attributes, PotionEffect[] effects, Sound ambientSound, Sound hurtSound, Sound deathSound, int aggroRange, Attack[] attacks, Ability[] abilities, SpawnCondition spawnCondition, Tameable tameable, Drop[] drops, int minXp, int maxXp) {
+	public FancyMob(String name, int maxHp, float moveSpeed, float scale, String[] modelName, EntityType baseType, int alignment, HashMap<Attribute, Double> attributes, PotionEffect[] effects, Sound ambientSound, Sound hurtSound, Sound deathSound, Sound stepSound, int aggroRange, Attack[] attacks, Ability[] abilities, SpawnCondition spawnCondition, Tameable tameable, Drop[] drops, int minXp, int maxXp) {
 		this.name = name;
 		this.maxHp = maxHp;
 		this.moveSpeed = moveSpeed;
@@ -95,6 +96,7 @@ public class FancyMob {
 		this.ambientSound = ambientSound;
 		this.hurtSound = hurtSound;
 		this.deathSound = deathSound;
+		this.stepSound = stepSound;
 		this.attacks = attacks;
 		this.abilities = abilities;
 		this.aggroRange = aggroRange;
@@ -106,7 +108,7 @@ public class FancyMob {
 	}
 	
 	public FancyMob clone() {
-		return new FancyMob(name, maxHp, moveSpeed, scale, modelName, baseType, alignment, attributes, effects, ambientSound, hurtSound, deathSound, aggroRange, attacks, abilities, spawnCondition, tameable, drops, minXp, maxXp);
+		return new FancyMob(name, maxHp, moveSpeed, scale, modelName, baseType, alignment, attributes, effects, ambientSound, hurtSound, deathSound, stepSound, aggroRange, attacks, abilities, spawnCondition, tameable, drops, minXp, maxXp);
 	}
 	
 	public void setup(LivingEntity le) {
@@ -308,7 +310,11 @@ public class FancyMob {
 			}
 			if (!nearbyPlayer)
 				return;
-			
+			Vector horizontalVelocity = entity.getVelocity().clone();
+			horizontalVelocity.setY(0);
+			if (horizontalVelocity.length() > 0.2 && stepSound != null) {
+				Util.playSound(stepSound, entity.getLocation());
+			}
 			if (entity.getHealth() <= maxHp/3 && !surrendering) {
 				for (Ability a : abilities) {
 					if (a.id == Ability.SURRENDER) {
