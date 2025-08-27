@@ -1,6 +1,7 @@
 package com.lerdorf.fancymobs;
 
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.player.Player;
 
@@ -63,6 +64,9 @@ public class Hostiler {
 	        	CraftAxolotl craft = (CraftAxolotl) entity;
 	            Axolotl nms = craft.getHandle();
 	            nms.goalSelector.addGoal(1, new MeleeAttackGoal(nms, 1.8D, true));
+	            nms.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(nms, Player.class, true));
+	            nms.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(4.0D);
+	            nms.goalSelector.addGoal(1, new MeleeAttackGoal(nms, 1.2D, true));
 	            nms.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(nms, Player.class, true));
 	            break;
 	        }

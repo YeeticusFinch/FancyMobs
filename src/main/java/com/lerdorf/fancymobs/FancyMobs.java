@@ -378,12 +378,12 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				new Attack[] { 
 						new Attack("attack", 10, new HashMap<>() {
 							{
-								put(Attack.KNOCKBACK, 4d);
+								put(Attack.KNOCKBACK, 1.5d);
 							}
 						}), 
 						new Attack("attackL", 8, new HashMap<>() {
 						{
-							put(Attack.KNOCKBACK, -4d);
+							put(Attack.KNOCKBACK, -1.5d);
 							put(Attack.SWEEP, 0.6d);
 						}
 						}) 
@@ -503,7 +503,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 					),
 						new Attack("run_attack", 10, new HashMap<>() {
 							{
-								put(Attack.KNOCKBACK, 1.5d);
+								put(Attack.KNOCKBACK, 1.3d);
 							}
 						}, 5, 600
 					)
@@ -583,19 +583,19 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				Sound.sound(Key.key("yeet:stego_idle"), Source.NEUTRAL, 1.0f, 0.6f),
 				Sound.sound(Key.key("yeet:stego_hurt"), Source.NEUTRAL, 1.0f, 0.6f),
 				Sound.sound(Key.key("yeet:stego_angry"), Source.NEUTRAL, 1.0f, 0.6f),
-				Sound.sound(Key.key("minecraft:entity.polar_bear.step"), Source.NEUTRAL, 1.0f, 1f),
+				Sound.sound(Key.key("minecraft:entity.ravager.step"), Source.NEUTRAL, 1.0f, 0.7f),
 				70,
 				new Attack[] { 
 						new Attack("neck attack", 6, new HashMap<>() {
 								{
-									put(Attack.KNOCKUP, 2d);
-									put(Attack.KNOCKBACK, 2d);
+									put(Attack.KNOCKUP, 1.6d);
+									put(Attack.KNOCKBACK, 1.6d);
 								}
 							}, 6, 900
 						),
 						new Attack("tail sweep", 11, new HashMap<>() {
 							{
-								put(Attack.KNOCKBACK, 2d);
+								put(Attack.KNOCKBACK, 1.6d);
 							}
 						}, 6, 900
 					)
@@ -743,26 +743,26 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 						),
 						new Attack("attack_bite_2", 8, new HashMap<>() {
 							{
-								put(Attack.SLOWNESS, 4d);
+								put(Attack.SLOWNESS, 3d);
 							}
 						}, 4, 1900
 					),
 						new Attack("slap_attack", 6, new HashMap<>() {
 							{
-								put(Attack.KNOCKBACK, 2d);
+								put(Attack.KNOCKBACK, 1.3d);
 							}
 						}, 3, 900
 					),
 						new Attack("tail_attack", 8, new HashMap<>() {
 							{
 								put(Attack.SWEEP, 1d);
-								put(Attack.SLOWNESS, 2d);
+								put(Attack.SLOWNESS, 1d);
 							}
 						}, 3, 2000
 					),
 						new Attack("kick_attack", 7, new HashMap<>() {
 							{
-								put(Attack.KNOCKBACK, 2d);
+								put(Attack.KNOCKBACK, 1.4d);
 								put(Attack.SLOWNESS, 2d);
 							}
 						}, 4, 1600
@@ -807,6 +807,35 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				null,
 				new Drop[] {
 						new Drop(rawDinosaurMeat, 0.1f, 1, 1),
+						new Drop(new ItemStack(Material.FEATHER), 0.6f, 0, 2)
+				}, 0, 3
+				));
+		
+		mobRegistry.put("buitreraptor", new FancyMob("Buitreraptor", 8, 0.4f, 0.4f, new String[] {"buitreraptor"}, EntityType.WOLF,
+				FancyMob.NEUTRAL, new HashMap<>() {
+					{
+						put(Attribute.ARMOR, 5d);
+						put(Attribute.WATER_MOVEMENT_EFFICIENCY, 0.5);
+					}
+				},
+				new PotionEffect[] {
+						//new PotionEffect(PotionEffectType.WATER_BREATHING, Integer.MAX_VALUE, 3, true, false)
+					},
+				Sound.sound(Key.key("yeet:cory_idle"), Source.VOICE, 1.0f, 0.9f),
+				Sound.sound(Key.key("yeet:cory_hurt"), Source.VOICE, 1.0f, 0.9f),
+				Sound.sound(Key.key("yeet:cory_hurt"), Source.VOICE, 1.0f, 0.9f),
+				Sound.sound(Key.key("minecraft:entity.chicken.step"), Source.NEUTRAL, 1.0f, 0.8f),
+				70,
+				new Attack[] { 
+						
+				},
+				new Ability[] {
+						new Ability(Ability.ROAR, "new", 1000)
+				},
+				new SpawnCondition(new int[] {SpawnCondition.onGround, SpawnCondition.specificFloorTypes, SpawnCondition.specificDimensions}, null, new Material[] {Material.GRASS_BLOCK, Material.DIRT, Material.COARSE_DIRT}, new Environment[] {Environment.NORMAL}),
+				null,
+				new Drop[] {
+						new Drop(rawDinosaurMeat, 0.1f, 0, 1),
 						new Drop(new ItemStack(Material.FEATHER), 0.6f, 0, 2)
 				}, 0, 3
 				));
@@ -928,8 +957,8 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 						),
 						new Attack("charge_attack", 9, new HashMap<>() {
 							{
-								put(Attack.KNOCKBACK, 3d);
-								put(Attack.KNOCKUP, 2d);
+								put(Attack.KNOCKBACK, 1.7d);
+								put(Attack.KNOCKUP, 1.8d);
 							}
 						}, 4, 1900
 					)
@@ -948,7 +977,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				));
 		
 
-		mobRegistry.put("pliosaurus", new FancyMob("Pliosaurus", 90, 0.3f, 1.5f, new String[] {"pliosaurus", "pliosaurus_2", "pliosaurus_3", "pliosaurus_4", "pliosaurus_5"}, EntityType.AXOLOTL,
+		mobRegistry.put("pliosaurus", new FancyMob("Pliosaurus", 90, 0.3f, 1.9f, new String[] {"pliosaurus", "pliosaurus_2", "pliosaurus_3", "pliosaurus_4", "pliosaurus_5"}, EntityType.AXOLOTL,
 				FancyMob.HOSTILE, new HashMap<>() {
 					{
 						put(Attribute.ARMOR, 14d);
@@ -1000,7 +1029,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				}, 3, 9
 				));
 		
-		mobRegistry.put("livyatan", new FancyMob("Livyatan", 80, 0.2f, 1.8f, new String[] {"livyatan"}, EntityType.AXOLOTL,
+		mobRegistry.put("livyatan", new FancyMob("Livyatan", 80, 0.2f, 1.6f, new String[] {"livyatan"}, EntityType.AXOLOTL,
 				FancyMob.NEUTRAL, new HashMap<>() {
 					{
 						put(Attribute.ARMOR, 10d);
@@ -1018,7 +1047,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				new Attack[] { 
 						new Attack("attack", 9, new HashMap<>() {
 								{
-									//put(Attack.SLOWNESS, 2d);
+									put(Attack.KNOCKBACK, 1.8d);
 								}
 							}, 7, 2000
 						)
@@ -1033,7 +1062,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				}, 1, 6
 				));
 		
-		mobRegistry.put("megalodon", new FancyMob("Megalodon", 80, 0.25f, 1.2f, new String[] {"megalodon"}, EntityType.AXOLOTL,
+		mobRegistry.put("megalodon", new FancyMob("Megalodon", 80, 0.25f, 1f, new String[] {"megalodon"}, EntityType.AXOLOTL,
 				FancyMob.HOSTILE, new HashMap<>() {
 					{
 						put(Attribute.ARMOR, 15d);
