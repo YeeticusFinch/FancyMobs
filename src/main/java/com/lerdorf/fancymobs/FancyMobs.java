@@ -977,7 +977,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				));
 		
 
-		mobRegistry.put("pliosaurus", new FancyMob("Pliosaurus", 90, 0.3f, 1.9f, new String[] {"pliosaurus", "pliosaurus_2", "pliosaurus_3", "pliosaurus_4", "pliosaurus_5"}, EntityType.AXOLOTL,
+		mobRegistry.put("pliosaurus", new FancyMob("Pliosaurus", 90, 0.3f, 1.9f, new String[] {"pliosaurus", "pliosaurus_2", "pliosaurus_3", "pliosaurus_4", "pliosaurus_5"}, EntityType.DROWNED,
 				FancyMob.HOSTILE, new HashMap<>() {
 					{
 						put(Attribute.ARMOR, 14d);
@@ -1062,7 +1062,7 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 				}, 1, 6
 				));
 		
-		mobRegistry.put("megalodon", new FancyMob("Megalodon", 80, 0.25f, 1f, new String[] {"megalodon"}, EntityType.AXOLOTL,
+		mobRegistry.put("megalodon", new FancyMob("Megalodon", 80, 0.25f, 1f, new String[] {"megalodon"}, EntityType.DROWNED,
 				FancyMob.HOSTILE, new HashMap<>() {
 					{
 						put(Attribute.ARMOR, 15d);
