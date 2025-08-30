@@ -718,6 +718,40 @@ public class FancyMobs extends JavaPlugin implements Listener, TabExecutor {
 						
 				}, 0, 3
 				));
+		
+		mobRegistry.put("deinonychus", new FancyMob("Deinonychus", 45, 0.28f, 0.95f, new String[] {"deinonychus", "deinonychus_2", "deinonychus_3", "deinonychus_4"}, EntityType.WOLF,
+				FancyMob.NEUTRAL, new HashMap<>() {
+					{
+						put(Attribute.ARMOR, 4d);
+						put(Attribute.STEP_HEIGHT, 2d);
+						//put(Attribute.WATER_MOVEMENT_EFFICIENCY, 0.5);
+					}
+				},
+				new PotionEffect[] {
+						new PotionEffect(PotionEffectType.JUMP_BOOST, Integer.MAX_VALUE, 2, true, false)
+					},
+				Sound.sound(Key.key("yeet:deinonychus_idle"), Source.NEUTRAL, 1.0f, 1.0f),
+				Sound.sound(Key.key("yeet:deinonychus_hurt"), Source.NEUTRAL, 1.0f, 1.0f),
+				Sound.sound(Key.key("yeet:deinonychus_death"), Source.NEUTRAL, 1.0f, 1.0f),
+				Sound.sound(Key.key("minecraft:entity.cow.step"), Source.NEUTRAL, 1.0f, 1.1f),
+				70,
+				new Attack[] { 
+						new Attack("attack", 6, new HashMap<>() {
+								{
+									put(Attack.KNOCKBACK, 1.5d);
+								}
+							}, 3, 900
+						)
+				},
+				new Ability[] {
+						//new Ability(Ability.ROAR, "warn", 2000)
+				},
+				new SpawnCondition(new int[] {SpawnCondition.onGround, SpawnCondition.specificFloorTypes, SpawnCondition.specificDimensions}, null, new Material[] {Material.GRASS_BLOCK, Material.DIRT, Material.COARSE_DIRT}, new Environment[] {Environment.NORMAL}),
+				null,
+				new Drop[] {
+						
+				}, 0, 3
+				));
 
 		mobRegistry.put("neovenator", new FancyMob("Neovenator", 40, 0.3f, 0.75f, new String[] {"neovenator_dinosauria", "neovenator_dinosauria_2", "neovenator_dinosauria_3", "neovenator_dinosauria_4", "neovenator_dinosauria_5"}, EntityType.POLAR_BEAR,
 				FancyMob.HOSTILE, new HashMap<>() {
